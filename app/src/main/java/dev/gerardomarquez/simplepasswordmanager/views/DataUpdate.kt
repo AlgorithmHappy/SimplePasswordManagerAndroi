@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,11 +42,11 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
 /**
  * Metodo principal donde se encuentra toda la estructura y los datos que se utilizan para la vista
- * de insertar datos
+ * de actualizacion de datos
  * @param modifier Modificador que se jalara del metodo padre
  */
 @Composable
-fun DataInsert(modifier: Modifier){
+fun DataUpdate(modifier: Modifier){
     var title by rememberSaveable { mutableStateOf(value = String()) }
     var user by rememberSaveable { mutableStateOf(value = String()) }
     var password by rememberSaveable { mutableStateOf(value = String()) }
@@ -73,14 +72,14 @@ fun DataInsert(modifier: Modifier){
             horizontalArrangement = Arrangement.Center
         ){
             Text(
-                text = Constants.HEADER_DATA_INSERT,
+                text = Constants.HEADER_DATA_UPDATE,
                 fontSize = Constants.SIZE_TEXT_TITLE.sp
             )
         }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(Constants.WEIGHT_LAYOUT_MAIN_INSERT),
+                .weight(Constants.WEIGHT_LAYOUT_MAIN_UPDATE),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ){
@@ -183,7 +182,7 @@ fun DataInsert(modifier: Modifier){
                         .weight(Constants.WEIGHT_LAYOUT_ONE_EIGHTH),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    UserDataInputInsert(
+                    UserDataInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_TITLE,
                         dataInput = title,
                         onDataInputChange = {title = it}
@@ -195,7 +194,7 @@ fun DataInsert(modifier: Modifier){
                         .weight(Constants.WEIGHT_LAYOUT_ONE_EIGHTH),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    UserDataInputInsert(
+                    UserDataInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_USER,
                         dataInput = user,
                         onDataInputChange = {user = it}
@@ -207,7 +206,7 @@ fun DataInsert(modifier: Modifier){
                         .weight(Constants.WEIGHT_LAYOUT_ONE_EIGHTH),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    UserDataPrivateInputInsert(
+                    UserDataPrivateInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_PASSWORD,
                         dataInput = password,
                         onDataInputChange = {password = it}
@@ -219,7 +218,7 @@ fun DataInsert(modifier: Modifier){
                         .weight(Constants.WEIGHT_LAYOUT_ONE_EIGHTH),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    UserDataPrivateInputInsert(
+                    UserDataPrivateInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_TOKEN,
                         dataInput = token,
                         onDataInputChange = {token = it}
@@ -231,7 +230,7 @@ fun DataInsert(modifier: Modifier){
                         .weight(Constants.WEIGHT_LAYOUT_ONE_EIGHTH),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    UserDataInputInsert(
+                    UserDataInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_COMMENTS,
                         dataInput = comments,
                         onDataInputChange = {comments = it}
@@ -243,7 +242,7 @@ fun DataInsert(modifier: Modifier){
                         .weight(Constants.WEIGHT_LAYOUT_ONE_EIGHTH),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    UserDataInputInsert(
+                    UserDataInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_URL,
                         dataInput = url,
                         onDataInputChange = {url = it}
@@ -255,7 +254,7 @@ fun DataInsert(modifier: Modifier){
                         .weight(Constants.WEIGHT_LAYOUT_ONE_EIGHTH),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    UserDataInputInsert(
+                    UserDataInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_EMAIL_RECOVERY,
                         dataInput = email,
                         onDataInputChange = {email = it}
@@ -267,7 +266,7 @@ fun DataInsert(modifier: Modifier){
                         .weight(Constants.WEIGHT_LAYOUT_ONE_EIGHTH),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    UserDataPhoneInputInsert(
+                    UserDataPhoneInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_PHONE_NUMBER,
                         dataInput = phone,
                         onDataInputChange = {phone = it}
@@ -293,7 +292,7 @@ fun DataInsert(modifier: Modifier){
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                ButtonCancelInsert()
+                ButtonCancelUpdate()
             }
             Spacer(modifier = Modifier.weight(0.1f))
             Column(
@@ -303,7 +302,7 @@ fun DataInsert(modifier: Modifier){
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ButtonOkInsert(
+                ButtonOkUpdate(
                     onClick = {
                         confirmationDialog = true
                     }
@@ -317,10 +316,10 @@ fun DataInsert(modifier: Modifier){
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ){
-            TextInstructionsInsert()
+            TextInstructionsUpdate()
         }
     }
-    SaveAlertDialogInsert(
+    SaveAlertDialogUpdate(
         show = confirmationDialog,
         onDismissRequest = {
             confirmationDialog = false
@@ -329,19 +328,19 @@ fun DataInsert(modifier: Modifier){
 }
 
 /**
- * TextField para ingresar todos los datos necesarios para la cuenta que quiere guardar
+ * TextField para ingresar todos los datos necesarios para la cuenta que quiere actualizar
  * @param placeHolder Texto de ejemplo que se mostrara en el textfield
  * @param dataInput Texto que ingresara el usuario en este elemento
  * @param onDataInputChange Metodo que se ejecutara para que se actualize y tome la informacion que
  * el usuario ingresa correctamente
  */
 @Composable
-fun UserDataInputInsert(placeHolder: String, dataInput: String, onDataInputChange: (String) -> Unit) {
+fun UserDataInputUpdate(placeHolder: String, dataInput: String, onDataInputChange: (String) -> Unit) {
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = dataInput,
         onValueChange = onDataInputChange,
-        placeholder = {Text(text = placeHolder, fontSize = Constants.SIZE_TEXT_PLACE_HOLDER.sp)}
+        placeholder = { Text(text = placeHolder, fontSize = Constants.SIZE_TEXT_PLACE_HOLDER.sp) }
     )
 }
 
@@ -354,7 +353,7 @@ fun UserDataInputInsert(placeHolder: String, dataInput: String, onDataInputChang
  * el usuario ingresa correctamente
  */
 @Composable
-fun UserDataPrivateInputInsert(placeHolder: String, dataInput: String, onDataInputChange: (String) -> Unit) {
+fun UserDataPrivateInputUpdate(placeHolder: String, dataInput: String, onDataInputChange: (String) -> Unit) {
     var textVisible by remember { mutableStateOf(false) }
 
     OutlinedTextField(
@@ -365,7 +364,8 @@ fun UserDataPrivateInputInsert(placeHolder: String, dataInput: String, onDataInp
         visualTransformation = if (textVisible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         trailingIcon = {
-            val icon = if (textVisible) painterResource(R.drawable.eye_closed_svgrepo_com) else painterResource(R.drawable.eye_svgrepo_com)
+            val icon = if (textVisible) painterResource(R.drawable.eye_closed_svgrepo_com) else painterResource(
+                R.drawable.eye_svgrepo_com)
             IconButton(
                 onClick = { textVisible = !textVisible }
             ) {
@@ -386,12 +386,12 @@ fun UserDataPrivateInputInsert(placeHolder: String, dataInput: String, onDataInp
  * el usuario ingresa correctamente
  */
 @Composable
-fun UserDataPhoneInputInsert(placeHolder: String, dataInput: String, onDataInputChange: (String) -> Unit) {
+fun UserDataPhoneInputUpdate(placeHolder: String, dataInput: String, onDataInputChange: (String) -> Unit) {
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = dataInput,
         onValueChange = onDataInputChange,
-        placeholder = {Text(text = placeHolder, fontSize = Constants.SIZE_TEXT_PLACE_HOLDER.sp)},
+        placeholder = { Text(text = placeHolder, fontSize = Constants.SIZE_TEXT_PLACE_HOLDER.sp) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
     )
 }
@@ -400,13 +400,13 @@ fun UserDataPhoneInputInsert(placeHolder: String, dataInput: String, onDataInput
  * Boton para insertar los datos ingresados en los elementos definidos en esta pantalla
  */
 @Composable
-fun ButtonOkInsert(onClick: () -> Unit){
+fun ButtonOkUpdate(onClick: () -> Unit){
     OutlinedButton(
         modifier = Modifier.fillMaxSize(),
         shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
         onClick = onClick
     ) {
-        Text(text = Constants.TEXT_BUTTON_INSERTAR)
+        Text(text = Constants.TEXT_BUTTON_UPDATE)
     }
 }
 
@@ -414,7 +414,7 @@ fun ButtonOkInsert(onClick: () -> Unit){
  * Boton para cancelar la accion de la pantalla
  */
 @Composable
-fun ButtonCancelInsert(){
+fun ButtonCancelUpdate(){
     OutlinedButton(
         modifier = Modifier.fillMaxSize(),
         shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
@@ -430,7 +430,7 @@ fun ButtonCancelInsert(){
  * Texto que indica que solo los campos con "*" son obligatorios
  */
 @Composable
-fun TextInstructionsInsert(){
+fun TextInstructionsUpdate(){
     Text(
         text = Constants.TEXT_INSERT_VIEW_INSTRUCTIONS,
         textAlign = TextAlign.Center
@@ -444,7 +444,7 @@ fun TextInstructionsInsert(){
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SaveAlertDialogInsert(show: Boolean, onDismissRequest: () -> Unit){
+fun SaveAlertDialogUpdate(show: Boolean, onDismissRequest: () -> Unit){
     if(show) {
         BasicAlertDialog(
             modifier = Modifier
@@ -465,7 +465,7 @@ fun SaveAlertDialogInsert(show: Boolean, onDismissRequest: () -> Unit){
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = Constants.TEXT_ALERT_DIALOG_INSERT_OK,
+                    text = Constants.TEXT_ALERT_DIALOG_UPDATE_OK,
                     textAlign = TextAlign.Center
                 )
 
@@ -478,6 +478,6 @@ fun SaveAlertDialogInsert(show: Boolean, onDismissRequest: () -> Unit){
 @Preview(
     showBackground = true
 )
-fun DataInsertPreview(){
-    DataInsert(modifier = Modifier.fillMaxSize())
+fun DataUpdatePreview(){
+    DataUpdate(modifier = Modifier.fillMaxSize())
 }
