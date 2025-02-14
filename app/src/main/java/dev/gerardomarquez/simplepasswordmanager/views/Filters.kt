@@ -1,16 +1,19 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
-import android.R
-import android.util.Log
-import android.widget.CheckBox
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,12 +23,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
+/**
+ * Metodo principal que ordena todos los elementos y variables que contendra la pantalla "Filters"
+ * @param modifier Modificador que contendra el padding y el maximo de pantalla de quien lo mande
+ * a llamar
+ */
 @Composable
 fun Filters(modifier: Modifier){
     var titleSelected by rememberSaveable { mutableStateOf(value = false) }
@@ -76,12 +86,15 @@ fun Filters(modifier: Modifier){
             phoneSelected = it
         }
     )
-
+    var confirmationDialog by rememberSaveable { mutableStateOf(value = false)}
 
     Column(
         modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
             .fillMaxSize()
-            .padding(horizontal = Constants.DP_PADDING.dp, vertical = Constants.DP_PADDING.dp),
+            .padding(
+                horizontal = Constants.DP_PADDING.dp,
+                vertical = Constants.DP_PADDING.dp
+            ),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
@@ -104,11 +117,31 @@ fun Filters(modifier: Modifier){
         CheckFilters(
             checkInformation = dataPhone
         )
+        Spacer(
+            Modifier.fillMaxWidth().height(height = Constants.DP_SACER_FILTERS.dp)
+        )
         FiltersInstructions()
-        ButtonSaveFilters()
+        Spacer(
+            Modifier.fillMaxWidth().height(height = Constants.DP_SACER_FILTERS.dp)
+        )
+        ButtonSaveFilters(
+            onClick = {
+                confirmationDialog = true
+            }
+        )
     }
+
+    DialogFilters(
+        show = confirmationDialog,
+        onDismissRequest = {
+            confirmationDialog = false
+        }
+    )
 }
 
+/**
+ * Encabezado de la pantalla
+ */
 @Composable
 fun HeaderFilters(){
     Text(
@@ -118,6 +151,10 @@ fun HeaderFilters(){
     )
 }
 
+/**
+ * Elemento que contiene todos los filtros con los que se puede realizar la busqueda
+ * @param checkInformation Datos empaquetados en una clase que necesita este metodo
+ */
 @Composable
 fun CheckFilters(checkInformation: CheckDataFilters){
     Row(
@@ -136,6 +173,9 @@ fun CheckFilters(checkInformation: CheckDataFilters){
     }
 }
 
+/**
+ * Instrucciones para que el usuario pueda manejar bien esta pantalla
+ */
 @Composable
 fun FiltersInstructions(){
     Text(
@@ -143,22 +183,64 @@ fun FiltersInstructions(){
     )
 }
 
+/**
+ * Boton que guarda los filtros en el archivo de propiedades
+ */
 @Composable
-fun ButtonSaveFilters(){
+fun ButtonSaveFilters(onClick: () -> Unit){
     OutlinedButton(
         shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
-        onClick = {
-            Log.i("logica:", "Aqui se hara la logica de guardar los datos en SQLite")
-        }
+        onClick = onClick
     ) {
         Text(text = Constants.TEXT_BUTTON_SAVE_FILTERS)
     }
 }
 
+/**
+ * Dialogo que confirma qe se guardaron correctamente las configuraciones de los filtros
+ * @param show Con esta variable se define si se mostrara o no el dialogo
+ * @param onDismissRequest Con este metodo se cambia el valor de la variable show para ocultar el
+ * dialogo
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DialogFilters(show: Boolean, onDismissRequest: () -> Unit){
+    if(show) {
+        BasicAlertDialog(
+            modifier = Modifier
+                .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_WIDTH)
+                .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_HEIGHT),
+            onDismissRequest = onDismissRequest,
+        ) {
+            Column(
+                modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
+                    .clip(RoundedCornerShape(Constants.DP_ROUNDED_DIALOGS.dp) )
+                    .fillMaxSize()
+                    .background(color = Color.White)
+                    .padding(
+                        horizontal = Constants.DP_PADDING_DIALOGS.dp,
+                        vertical = Constants.DP_PADDING_DIALOGS.dp
+                    ),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = Constants.TEXT_ALERT_DIALOG_FILTERS_OK,
+                    textAlign = TextAlign.Center
+                )
+
+            }
+        }
+    }
+}
+
+/**
+ * Clase para los checks de la pantalla con la informacion necesaria
+ */
 data class CheckDataFilters(
-    val title: String,
-    var selected: Boolean = false,
-    var onCheckedChange: (Boolean) -> Unit
+    val title: String, // Titulo del check
+    var selected: Boolean = false, // Si el check esta seleccionado o no
+    var onCheckedChange: (Boolean) -> Unit // Metodo para cambiar la variable "selected"
 )
 
 @Composable

@@ -36,6 +36,12 @@ class Constants {
         val WEIGHT_LAYOUT_ONE_EIGHTH: Float = 0.125f
         val WEIGHT_LAYOUT_DIALOGS_HEIGHT: Float = 0.25f
         val WEIGHT_LAYOUT_DIALOGS_WIDTH: Float = 0.95f
+        val WEIGHT_LAYOUT_MAIN_FILTER: Float = 0.03f
+        val WEIGHT_LAYOUT_SEARCH_BAR_MAIN: Float = 0.84f
+        val WEIGHT_LAYOUT_ICON_FILTER: Float = 0.13f
+        val WEIGHT_LAYOUT_MAIN_SOME_ROWS: Float = 0.08f
+        val WEIGHT_LAYOUT_MAIN_MIDLE_ROW: Float = 0.8f
+        val WEIGHT_LAYOUT_MAIN_BUTTONS: Float = 0.45f
 
         /**
          * Descripcion de los widgets para que le entienda el usuario
@@ -45,6 +51,8 @@ class Constants {
         val DESCRIPTION_ICON_OPEN: String = "Abrir explorador de archivos"
         val DESCRIPTION_PASSWORD: String = "Contraseña";
         val DESCRIPTION_PASSWORD_VISIBILITY: String = "Boton para ocultar o mostrar contraseña/token"
+        val DESCRIPTION_ICON_SEARCH: String = "Lupa de busqueda"
+        val DESCRIPTION_ICON_FILTER: String = "Lupa de busqueda"
         val DESCRIPTION_ICON_NEW: String = "Abrir explorador de archivos"
         val DESCRIPTION_DATA_INPUT_TITLE: String = "Ej. Cuenta de Facebook"
         val DESCRIPTION_DATA_INPUT_USER: String = "Ej. JuanP096"
@@ -54,6 +62,7 @@ class Constants {
         val DESCRIPTION_DATA_INPUT_URL: String = "Ej. www.facebook.com"
         val DESCRIPTION_DATA_INPUT_EMAIL_RECOVERY: String = "Ej. micorreo@gmail.com"
         val DESCRIPTION_DATA_INPUT_PHONE_NUMBER: String = "Ej. 5520306688"
+        val DESCRIPTION_DATA_INPUT_SEARCH_BAR: String = "Ej. tiktok"
 
         /**
          * Variables globales
@@ -78,10 +87,13 @@ class Constants {
         val TEXT_BUTTON_INSERTAR: String = "Insertar";
         val TEXT_BUTTON_UPDATE: String = "Actualizar";
         val TEXT_BUTTON_CANCEL: String = "Cancelar";
+        val TEXT_BUTTON_SAVE_FILE: String = "Guardar archivo";
+        val TEXT_BUTTON_NEW_INSERT: String = "Insertar nuevo";
         val TEXT_BUTTON_SAVE_FILTERS: String = "Guardar filtros";
         val TEXT_INSERT_VIEW_INSTRUCTIONS: String = "Los campos marcados con \"*\" son obligatorios y el campo titulo debe ser unico"
         val TEXT_ALERT_DIALOG_INSERT_OK: String = "Se ha insertado correctamente el registro, para mantener los cambios favor de presionar el boton \"Guardar archivo\""
         val TEXT_ALERT_DIALOG_UPDATE_OK: String = "Se ha actualizado correctamente el registro, para mantener los cambios favor de presionar el boton \"Guardar archivo\""
+        val TEXT_ALERT_DIALOG_FILTERS_OK: String = "Se ha guardado correctamente la configuracion de filtros"
         val TEXT_CHECK_TITLE: String = "Titulo";
         val TEXT_CHECK_USER: String = "Usuario";
         val TEXT_CHECK_COMMENTS: String = "Comentarios";
@@ -89,6 +101,7 @@ class Constants {
         val TEXT_CHECK_EMAIL: String = "Correo de recuperacion";
         val TEXT_CHECK_PHONE: String = "Telefono de recuperacion";
         val TEXT_FILTERS_INSTRUCTIONS: String = "*Al menos un filtro deberia estar activo";
+        val TEXT_MAIN: String = "Lista de contraseñas"
 
         /**
          * Tamaños de dp's
@@ -98,6 +111,7 @@ class Constants {
         val DP_PADDING_INSERTS_BUTTONS: Int = 10
         val DP_PADDING_DIALOGS: Int = 20
         val DP_ROUNDED_DIALOGS: Int = 4
+        val DP_SACER_FILTERS: Int = 15
 
         /**
          * Texts
