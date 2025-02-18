@@ -1,6 +1,6 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
-import android.graphics.drawable.Icon
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,13 +9,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -31,7 +35,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import dev.gerardomarquez.simplepasswordmanager.R
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
@@ -43,15 +51,17 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
  */
 @Composable
 fun Main(modifier: Modifier){
+    val scrollState = rememberScrollState()
     var textSearch by rememberSaveable { mutableStateOf( value = String() ) }
     var information: DataPassword = DataPassword(
         title = "Titulo",
         user =  "usuario",
+        password = "password",
         url = "URL",
         email = "email",
         phone = "phone",
         comments = "comentarios",
-        secretCode = "token codigo secreto"
+        secretCode = "token codigo secreto000000000000"
     )
 
     Column(
@@ -61,7 +71,7 @@ fun Main(modifier: Modifier){
                 horizontal = Constants.DP_PADDING.dp,
                 vertical = Constants.DP_PADDING.dp
             ),
-        verticalArrangement = Arrangement.Center,
+        //verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
@@ -96,11 +106,31 @@ fun Main(modifier: Modifier){
             )
         }
         Row(
-            modifier = Modifier.fillMaxWidth().weight(Constants.WEIGHT_LAYOUT_MAIN_MIDLE_ROW)
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(Constants.WEIGHT_LAYOUT_MAIN_MIDLE_ROW)
+                .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp)
         ){
-            InformationPasswordDropDown(
-                information = information
-            )
+            Column(
+                modifier = Modifier
+                    .weight(Constants.WEIGHT_LAYOUT_FULL)
+                    .verticalScroll(scrollState)
+            ){
+                repeat(15){ // Aqui se tendra que modificar para aceptar todos los elementos
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(Constants.DP_HEIGHT_PASSWORDS_DROPDOWN.dp)
+                    ){
+                        InformationPasswordDropDown(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp),
+                            information = information
+                        )
+                    }
+                }
+            }
         }
         Row(
             modifier = Modifier.fillMaxWidth().weight(Constants.WEIGHT_LAYOUT_MAIN_SOME_ROWS)
@@ -222,41 +252,252 @@ fun ButtonSaveFile(modifier: Modifier, onClick: () -> Unit){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InformationPasswordDropDown(
+    modifier: Modifier,
     information: DataPassword
 ) {
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
+        modifier = modifier,
         expanded = expanded,
         onExpandedChange = { expanded = !expanded }
     ) {
-        Button(
-            shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
-            onClick = {
-                expanded = !expanded
-            }
-        ){
-            Text(
-                text = information.title
-            )
+        // Encabezado
+        Row(
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxSize()
+                .clip(RoundedCornerShape(Constants.DP_ROUNDED_ROW.dp))
+                .background(MaterialTheme.colorScheme.primary.copy(0.5f)) // Cambiar color
+                .padding(Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             val iconUp = painterResource(R.drawable.alt_arrow_up_svgrepo_com)
             val iconDown = painterResource(R.drawable.alt_arrow_down_svgrepo_com)
+            // Título
+            Text(
+                text = information.title,
+                modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_FULL),
+                fontSize = Constants.SIZE_TEXT_TITLE_DROPDOWN.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            // Icono de expansión
             Icon(
+                modifier = Modifier.clickable { expanded = !expanded },
                 painter = if (expanded) iconUp else iconDown,
                 contentDescription = Constants.DESCRIPTION_ICON_DROPDOWN_LOGIN,
-                modifier = Modifier
-                    .clickable { expanded = !expanded }
+                tint = MaterialTheme.colorScheme.primary
             )
         }
+        // Contenido expandible
         ExposedDropdownMenu(
+            modifier = Modifier
+                .exposedDropdownSize(),
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            Text(text = "prueba")
-            Text(text = "prueba")
-            Text(text = "prueba")
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Constants.DP_PADDING_INFORMATION_DROPDOWN.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp)
+                ) {
+                    Text(
+                        text = Constants.TXT_USER_DROPDOWN,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = Constants.SIZE_TEXT_TITLE_DROPDOWN.sp,
+                        style = TextStyle(
+                            textDecoration = TextDecoration.Underline
+                        ),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(
+                        modifier = Modifier.weight(0.1f)
+                    )
+                    Text(
+                        text = information.user,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = 14.sp
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp)
+                ) {
+                    Text(
+                        text = Constants.TXT_PASSWORD_DROPDOWN,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = Constants.SIZE_TEXT_TITLE_DROPDOWN.sp,
+                        style = TextStyle(
+                            textDecoration = TextDecoration.Underline
+                        ),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(
+                        modifier = Modifier.weight(0.1f)
+                    )
+                    Text(
+                        text = information.password,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = 14.sp
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp)
+                ) {
+                    Text(
+                        text = Constants.TXT_SECRED_CODE_TOKEN,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = Constants.SIZE_TEXT_TITLE_DROPDOWN.sp,
+                        style = TextStyle(
+                            textDecoration = TextDecoration.Underline
+                        ),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(
+                        modifier = Modifier.weight(0.1f)
+                    )
+                    Text(
+                        text = information.secretCode,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = 14.sp
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp)
+                ) {
+                    Text(
+                        text = Constants.TXT_COMMENTS,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = Constants.SIZE_TEXT_TITLE_DROPDOWN.sp,
+                        style = TextStyle(
+                            textDecoration = TextDecoration.Underline
+                        ),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(
+                        modifier = Modifier.weight(0.1f)
+                    )
+                    Text(
+                        text = information.comments,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = 14.sp
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp)
+                ) {
+                    Text(
+                        text = Constants.TXT_URL,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = Constants.SIZE_TEXT_TITLE_DROPDOWN.sp,
+                        style = TextStyle(
+                            textDecoration = TextDecoration.Underline
+                        ),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(
+                        modifier = Modifier.weight(0.1f)
+                    )
+                    Text(
+                        text = information.url,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = 14.sp
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp)
+                ) {
+                    Text(
+                        text = Constants.TXT_EMAIL,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = Constants.SIZE_TEXT_TITLE_DROPDOWN.sp,
+                        style = TextStyle(
+                            textDecoration = TextDecoration.Underline
+                        ),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(
+                        modifier = Modifier.weight(0.1f)
+                    )
+                    Text(
+                        text = information.email,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = 14.sp
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp)
+                ) {
+                    Text(
+                        text = Constants.TXT_PHONE_NUMBER,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = Constants.SIZE_TEXT_TITLE_DROPDOWN.sp,
+                        style = TextStyle(
+                            textDecoration = TextDecoration.Underline
+                        ),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(
+                        modifier = Modifier.weight(0.1f)
+                    )
+                    Text(
+                        text = information.phone,
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
+                        fontSize = 14.sp
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp)
+                ) {
+                    Button(
+                        modifier = Modifier.weight(0.375f),
+                        shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
+                        onClick = {
+
+                        }
+                    ){
+                        Text(
+                            text = Constants.TEXT_BUTTON_DELETE
+                        )
+                    }
+                    Spacer(
+                        modifier = Modifier.weight(0.15f)
+                    )
+                    Button(
+                        modifier = Modifier.weight(0.375f),
+                        shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
+                        onClick = {
+
+                        }
+                    ){
+                        Text(
+                            text = Constants.TEXT_BUTTON_UPDATE
+                        )
+                    }
+                }
+            }
         }
     }
+
 }
 
 /**
@@ -265,6 +506,7 @@ fun InformationPasswordDropDown(
 data class DataPassword(
     var title: String, // Titulo del check
     var user: String, // Si el check esta seleccionado o no
+    var password: String,
     var secretCode: String, // Metodo para cambiar la variable "selected"
     var comments: String, // Titulo del check
     var url: String, // Titulo del check

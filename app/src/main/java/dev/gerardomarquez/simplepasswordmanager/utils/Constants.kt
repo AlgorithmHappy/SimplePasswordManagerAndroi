@@ -42,6 +42,8 @@ class Constants {
         val WEIGHT_LAYOUT_MAIN_SOME_ROWS: Float = 0.08f
         val WEIGHT_LAYOUT_MAIN_MIDLE_ROW: Float = 0.8f
         val WEIGHT_LAYOUT_MAIN_BUTTONS: Float = 0.45f
+        val WEIGHT_LAYOUT_FULL: Float = 1f
+        val WEIGHT_LAYOUT_INFORMATION_DROPDOWN: Float = 0.45f
 
         /**
          * Descripcion de los widgets para que le entienda el usuario
@@ -74,6 +76,7 @@ class Constants {
          */
         val SIZE_TEXT_TITLE: Int = 24;
         val SIZE_TEXT_PLACE_HOLDER: Int = 10;
+        val SIZE_TEXT_TITLE_DROPDOWN: Int = 16;
 
         /**
          * Tamaños de spaces
@@ -86,6 +89,7 @@ class Constants {
         val TEXT_LOGIN: String = "Ingresar";
         val TEXT_BUTTON_INSERTAR: String = "Insertar";
         val TEXT_BUTTON_UPDATE: String = "Actualizar";
+        val TEXT_BUTTON_DELETE: String = "Eliminar";
         val TEXT_BUTTON_CANCEL: String = "Cancelar";
         val TEXT_BUTTON_SAVE_FILE: String = "Guardar archivo";
         val TEXT_BUTTON_NEW_INSERT: String = "Insertar nuevo";
@@ -112,6 +116,10 @@ class Constants {
         val DP_PADDING_DIALOGS: Int = 20
         val DP_ROUNDED_DIALOGS: Int = 4
         val DP_SACER_FILTERS: Int = 15
+        val DP_PADDING_PASSWORDS_DROPDOWNS_MENUS: Int = 10
+        val DP_HEIGHT_PASSWORDS_DROPDOWN: Int = 70
+        val DP_ROUNDED_ROW: Int = 4
+        val DP_PADDING_INFORMATION_DROPDOWN: Int = 16
 
         /**
          * Texts
@@ -124,6 +132,8 @@ class Constants {
         val TXT_URL: String = "Pagina WEB:"
         val TXT_EMAIL: String = "Correo de recuperación:"
         val TXT_PHONE_NUMBER: String = "Cel. de recuperación:"
+        val TXT_USER_DROPDOWN: String = "Usuario:"
+        val TXT_PASSWORD_DROPDOWN: String = "Contraseña:"
 
     }
 }
