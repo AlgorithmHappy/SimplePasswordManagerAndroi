@@ -102,6 +102,7 @@ class Constants {
         val TEXT_ALERT_DIALOG_UPDATE_OK: String = "Se ha actualizado correctamente el registro, para mantener los cambios favor de presionar el boton \"Guardar archivo\""
         val TEXT_ALERT_DIALOG_FILTERS_OK: String = "Se ha guardado correctamente la configuracion de filtros"
         val TEXT_ALERT_DIALOG_MAIN_SAVE: String = "Se ha guardado correctamente los registros en el archivo"
+        val TEXT_ALERT_DIALOG_MAIN_DELATE: String = "¿Seguro que quieres eliminar el archivo?"
         val TEXT_CHECK_TITLE: String = "Titulo";
         val TEXT_CHECK_USER: String = "Usuario";
         val TEXT_CHECK_COMMENTS: String = "Comentarios";

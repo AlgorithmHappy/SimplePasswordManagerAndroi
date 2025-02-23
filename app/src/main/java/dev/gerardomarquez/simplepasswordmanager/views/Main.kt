@@ -43,6 +43,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -65,6 +67,7 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 @Composable
 fun Main(modifier: Modifier){
     val scrollState = rememberScrollState()
+    val density = LocalDensity.current // Obtener la densidad de la pantalla
     var textSearch by rememberSaveable { mutableStateOf( value = String() ) }
     var information: DataPassword = DataPassword(
         title = "Titulo",
@@ -77,7 +80,8 @@ fun Main(modifier: Modifier){
         secretCode = "token codigo secreto000000000000"
     )
     var confirmationDialog by rememberSaveable { mutableStateOf(value = false)}
-    val density = LocalDensity.current // Obtener la densidad de la pantalla
+    var layoutCoordinates by rememberSaveable { mutableStateOf<LayoutCoordinates?>(value = null) }
+    var showDialogDelate by rememberSaveable { mutableStateOf(value = false)}
 
     Column(
         modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
@@ -129,6 +133,9 @@ fun Main(modifier: Modifier){
                 .fillMaxWidth()
                 .weight(Constants.WEIGHT_LAYOUT_MAIN_MIDLE_ROW)
                 .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp)
+                .onGloballyPositioned {
+                    cordinates -> layoutCoordinates = cordinates
+                }
         ){
             Column(
                 modifier = Modifier
@@ -145,8 +152,11 @@ fun Main(modifier: Modifier){
                             .pointerInput(Unit){
                                 detectTapGestures(
                                     onLongPress = {
-                                        offset -> menuOffset = offset
-                                        showMenuLongPress = true // Activa el menú al hacer touch sostenido
+                                        offset -> layoutCoordinates?.let { layout ->
+                                            val positionInWindow = layout.localToWindow(offset) // Convierte la posición relativa a absoluta
+                                            menuOffset = positionInWindow
+                                            showMenuLongPress = true // Activa el menú al hacer touch sostenido
+                                        }
                                     }
                                 )
                             }
@@ -166,7 +176,12 @@ fun Main(modifier: Modifier){
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp),
-                            information = information
+                            information = information,
+                            showDialog = showDialogDelate,
+                            onClickOk = {},
+                            onClickDelate = {
+                                showDialogDelate = true
+                            }
                         )
                     }
                 }
@@ -203,6 +218,13 @@ fun Main(modifier: Modifier){
         show = confirmationDialog,
         onDismissRequest = {
             confirmationDialog = false
+        }
+    )
+
+    DialogDelateMain(
+        show = showDialogDelate,
+        onDismissRequest = {
+            showDialogDelate = false
         }
     )
 }
@@ -306,7 +328,10 @@ fun ButtonSaveFile(modifier: Modifier, onClick: () -> Unit){
 @Composable
 fun InformationPasswordDropDown(
     modifier: Modifier,
-    information: DataPassword
+    information: DataPassword,
+    showDialog: Boolean,
+    onClickOk: () -> Unit,
+    onClickDelate: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -557,9 +582,7 @@ fun InformationPasswordDropDown(
                     Button(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_BUTTONS_DROPDOWN),
                         shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
-                        onClick = {
-
-                        }
+                        onClick = onClickDelate
                     ){
                         Text(
                             text = Constants.TEXT_BUTTON_DELETE
@@ -571,9 +594,7 @@ fun InformationPasswordDropDown(
                     Button(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_BUTTONS_DROPDOWN),
                         shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
-                        onClick = {
-
-                        }
+                        onClick = onClickOk
                     ){
                         Text(
                             text = Constants.TEXT_BUTTON_UPDATE
@@ -646,6 +667,68 @@ fun LongPressMenu(showMenu: Boolean, menuOffset: Offset, density: Density, onDis
             text = { Text("Copiar token") },
             onClick = onClick
         )
+    }
+}
+
+/**
+ * Dialogo que confirma si se quiere eliminar el registro
+ * @param show Con esta variable se define si se mostrara o no el dialogo
+ * @param onDismissRequest Con este metodo se cambia el valor de la variable show para ocultar el
+ * dialogo
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DialogDelateMain(show: Boolean, onDismissRequest: () -> Unit){
+    if(show) {
+        BasicAlertDialog(
+            modifier = Modifier
+                .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_WIDTH)
+                .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_HEIGHT),
+            onDismissRequest = onDismissRequest,
+        ) {
+            Column(
+                modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
+                    .clip(RoundedCornerShape(Constants.DP_ROUNDED_DIALOGS.dp) )
+                    .fillMaxSize()
+                    .background(color = Color.White)
+                    .padding(
+                        horizontal = Constants.DP_PADDING_DIALOGS.dp,
+                        vertical = Constants.DP_PADDING_DIALOGS.dp
+                    ),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = Constants.TEXT_ALERT_DIALOG_MAIN_DELATE,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(
+                    modifier = Modifier.height(15.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ){
+                    Button(
+                        modifier = Modifier.weight(0.35f),
+                        shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
+                        onClick = onDismissRequest
+                    ){
+                        Text("Si")
+                    }
+                    Spacer(modifier = Modifier.weight(0.30f))
+                    Button(
+                        modifier = Modifier.weight(0.35f),
+                        shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
+                        onClick = onDismissRequest
+                    ){
+                        Text("No")
+                    }
+                }
+            }
+        }
     }
 }
 
