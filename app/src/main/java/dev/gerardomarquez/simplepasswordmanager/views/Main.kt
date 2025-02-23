@@ -2,6 +2,7 @@ package dev.gerardomarquez.simplepasswordmanager.views
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,11 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -36,10 +40,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpOffset
 import dev.gerardomarquez.simplepasswordmanager.R
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
@@ -63,6 +76,8 @@ fun Main(modifier: Modifier){
         comments = "comentarios",
         secretCode = "token codigo secreto000000000000"
     )
+    var confirmationDialog by rememberSaveable { mutableStateOf(value = false)}
+    val density = LocalDensity.current // Obtener la densidad de la pantalla
 
     Column(
         modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
@@ -75,14 +90,18 @@ fun Main(modifier: Modifier){
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().weight(Constants.WEIGHT_LAYOUT_MAIN_SOME_ROWS),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(Constants.WEIGHT_LAYOUT_MAIN_SOME_ROWS),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ){
             HeaderMain()
         }
         Row(
-            modifier = Modifier.fillMaxWidth().weight(Constants.WEIGHT_LAYOUT_MAIN_SOME_ROWS),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(Constants.WEIGHT_LAYOUT_MAIN_SOME_ROWS),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ){
@@ -117,11 +136,32 @@ fun Main(modifier: Modifier){
                     .verticalScroll(scrollState)
             ){
                 repeat(15){ // Aqui se tendra que modificar para aceptar todos los elementos
+                    var showMenuLongPress by rememberSaveable { mutableStateOf(value = false)}
+                    var menuOffset by remember { mutableStateOf(Offset.Zero) }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(Constants.DP_HEIGHT_PASSWORDS_DROPDOWN.dp)
+                            .pointerInput(Unit){
+                                detectTapGestures(
+                                    onLongPress = {
+                                        offset -> menuOffset = offset
+                                        showMenuLongPress = true // Activa el menú al hacer touch sostenido
+                                    }
+                                )
+                            }
                     ){
+                        LongPressMenu(
+                            showMenu = showMenuLongPress,
+                            menuOffset = menuOffset,
+                            density = density,
+                            onDismissRequest = {
+                                showMenuLongPress = false
+                            },
+                            onClick = {
+                                showMenuLongPress = false
+                            }
+                        )
                         InformationPasswordDropDown(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -133,10 +173,14 @@ fun Main(modifier: Modifier){
             }
         }
         Row(
-            modifier = Modifier.fillMaxWidth().weight(Constants.WEIGHT_LAYOUT_MAIN_SOME_ROWS)
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(Constants.WEIGHT_LAYOUT_MAIN_SOME_ROWS)
         ){
             ButtonInsert(
-                modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_MAIN_BUTTONS).fillMaxHeight(),
+                modifier = Modifier
+                    .weight(Constants.WEIGHT_LAYOUT_MAIN_BUTTONS)
+                    .fillMaxHeight(),
                 onClick = {
 
                 }
@@ -145,13 +189,22 @@ fun Main(modifier: Modifier){
                 modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
             )
             ButtonSaveFile(
-                modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_MAIN_BUTTONS).fillMaxHeight(),
+                modifier = Modifier
+                    .weight(Constants.WEIGHT_LAYOUT_MAIN_BUTTONS)
+                    .fillMaxHeight(),
                 onClick = {
-
+                    confirmationDialog = true
                 }
             )
         }
     }
+
+    DialogMain(
+        show = confirmationDialog,
+        onDismissRequest = {
+            confirmationDialog = false
+        }
+    )
 }
 
 /**
@@ -317,18 +370,19 @@ fun InformationPasswordDropDown(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(
-                        modifier = Modifier.weight(0.1f)
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
                     Text(
                         text = information.user,
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
-                        fontSize = 14.sp
+                        fontSize = Constants.SIZE_TEXT_VALUES_DROPDOWN.sp
                     )
                 }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 10.dp)
+                        .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = Constants.TXT_PASSWORD_DROPDOWN,
@@ -340,18 +394,35 @@ fun InformationPasswordDropDown(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(
-                        modifier = Modifier.weight(0.1f)
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
-                    Text(
-                        text = information.password,
+
+                    var textVisible by remember { mutableStateOf(value = false) }
+                    OutlinedTextField(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
-                        fontSize = 14.sp
+                        value = information.password,
+                        enabled = false,
+                        onValueChange = { },
+                        visualTransformation = if (textVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            val icon = if (textVisible) painterResource(R.drawable.eye_closed_svgrepo_com) else painterResource(
+                                R.drawable.eye_svgrepo_com)
+                            IconButton(
+                                onClick = { textVisible = !textVisible }
+                            ) {
+                                Icon(
+                                    painter = icon,
+                                    contentDescription = Constants.DESCRIPTION_PASSWORD_VISIBILITY
+                                )
+                            }
+                        }
                     )
                 }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 10.dp)
+                        .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = Constants.TXT_SECRED_CODE_TOKEN,
@@ -363,18 +434,33 @@ fun InformationPasswordDropDown(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(
-                        modifier = Modifier.weight(0.1f)
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
-                    Text(
-                        text = information.secretCode,
+                    var textVisible by remember { mutableStateOf(value = false) }
+                    OutlinedTextField(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
-                        fontSize = 14.sp
+                        value = information.secretCode,
+                        enabled = false,
+                        onValueChange = { },
+                        visualTransformation = if (textVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            val icon = if (textVisible) painterResource(R.drawable.eye_closed_svgrepo_com) else painterResource(
+                                R.drawable.eye_svgrepo_com)
+                            IconButton(
+                                onClick = { textVisible = !textVisible }
+                            ) {
+                                Icon(
+                                    painter = icon,
+                                    contentDescription = Constants.DESCRIPTION_PASSWORD_VISIBILITY
+                                )
+                            }
+                        }
                     )
                 }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 10.dp)
+                        .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp)
                 ) {
                     Text(
                         text = Constants.TXT_COMMENTS,
@@ -386,18 +472,18 @@ fun InformationPasswordDropDown(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(
-                        modifier = Modifier.weight(0.1f)
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
                     Text(
                         text = information.comments,
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
-                        fontSize = 14.sp
+                        fontSize = Constants.SIZE_TEXT_VALUES_DROPDOWN.sp
                     )
                 }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 10.dp)
+                        .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp)
                 ) {
                     Text(
                         text = Constants.TXT_URL,
@@ -409,18 +495,18 @@ fun InformationPasswordDropDown(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(
-                        modifier = Modifier.weight(0.1f)
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
                     Text(
                         text = information.url,
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
-                        fontSize = 14.sp
+                        fontSize = Constants.SIZE_TEXT_VALUES_DROPDOWN.sp
                     )
                 }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 10.dp)
+                        .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp)
                 ) {
                     Text(
                         text = Constants.TXT_EMAIL,
@@ -432,18 +518,18 @@ fun InformationPasswordDropDown(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(
-                        modifier = Modifier.weight(0.1f)
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
                     Text(
                         text = information.email,
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
-                        fontSize = 14.sp
+                        fontSize = Constants.SIZE_TEXT_VALUES_DROPDOWN.sp
                     )
                 }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 10.dp)
+                        .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp)
                 ) {
                     Text(
                         text = Constants.TXT_PHONE_NUMBER,
@@ -455,21 +541,21 @@ fun InformationPasswordDropDown(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(
-                        modifier = Modifier.weight(0.1f)
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
                     Text(
                         text = information.phone,
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
-                        fontSize = 14.sp
+                        fontSize = Constants.SIZE_TEXT_VALUES_DROPDOWN.sp
                     )
                 }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 10.dp)
+                        .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp)
                 ) {
                     Button(
-                        modifier = Modifier.weight(0.375f),
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_BUTTONS_DROPDOWN),
                         shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
                         onClick = {
 
@@ -480,10 +566,10 @@ fun InformationPasswordDropDown(
                         )
                     }
                     Spacer(
-                        modifier = Modifier.weight(0.15f)
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_BUTTONS_SPACER_DROPDOWN)
                     )
                     Button(
-                        modifier = Modifier.weight(0.375f),
+                        modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_BUTTONS_DROPDOWN),
                         shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
                         onClick = {
 
@@ -498,6 +584,69 @@ fun InformationPasswordDropDown(
         }
     }
 
+}
+
+/**
+ * Dialogo que confirma qe se guardaron correctamente el archivo de base de datos
+ * @param show Con esta variable se define si se mostrara o no el dialogo
+ * @param onDismissRequest Con este metodo se cambia el valor de la variable show para ocultar el
+ * dialogo
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DialogMain(show: Boolean, onDismissRequest: () -> Unit){
+    if(show) {
+        BasicAlertDialog(
+            modifier = Modifier
+                .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_WIDTH)
+                .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_HEIGHT),
+            onDismissRequest = onDismissRequest,
+        ) {
+            Column(
+                modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
+                    .clip(RoundedCornerShape(Constants.DP_ROUNDED_DIALOGS.dp) )
+                    .fillMaxSize()
+                    .background(color = Color.White)
+                    .padding(
+                        horizontal = Constants.DP_PADDING_DIALOGS.dp,
+                        vertical = Constants.DP_PADDING_DIALOGS.dp
+                    ),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = Constants.TEXT_ALERT_DIALOG_MAIN_SAVE,
+                    textAlign = TextAlign.Center
+                )
+
+            }
+        }
+    }
+}
+
+/**
+ * Sub menu copiar usuario, contraseña o token
+ */
+@Composable
+fun LongPressMenu(showMenu: Boolean, menuOffset: Offset, density: Density, onDismissRequest: () -> Unit, onClick: () -> Unit) {
+    DropdownMenu(
+        expanded = showMenu,
+        onDismissRequest = onDismissRequest,
+        offset = DpOffset((menuOffset.x / density.density).dp, (menuOffset.y / density.density).dp)
+    ) {
+        DropdownMenuItem(
+            text = { Text("Copiar usuario") },
+            onClick = onClick
+        )
+        DropdownMenuItem(
+            text = { Text("Copiar contraseña") },
+            onClick = onClick
+        )
+        DropdownMenuItem(
+            text = { Text("Copiar token") },
+            onClick = onClick
+        )
+    }
 }
 
 /**

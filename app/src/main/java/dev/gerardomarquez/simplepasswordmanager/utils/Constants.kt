@@ -44,6 +44,8 @@ class Constants {
         val WEIGHT_LAYOUT_MAIN_BUTTONS: Float = 0.45f
         val WEIGHT_LAYOUT_FULL: Float = 1f
         val WEIGHT_LAYOUT_INFORMATION_DROPDOWN: Float = 0.45f
+        val WEIGHT_LAYOUT_BUTTONS_DROPDOWN: Float = 0.375f
+        val WEIGHT_LAYOUT_BUTTONS_SPACER_DROPDOWN: Float = 0.15f
 
         /**
          * Descripcion de los widgets para que le entienda el usuario
@@ -77,6 +79,7 @@ class Constants {
         val SIZE_TEXT_TITLE: Int = 24;
         val SIZE_TEXT_PLACE_HOLDER: Int = 10;
         val SIZE_TEXT_TITLE_DROPDOWN: Int = 16;
+        val SIZE_TEXT_VALUES_DROPDOWN: Int = 14;
 
         /**
          * Tamaños de spaces
@@ -98,6 +101,7 @@ class Constants {
         val TEXT_ALERT_DIALOG_INSERT_OK: String = "Se ha insertado correctamente el registro, para mantener los cambios favor de presionar el boton \"Guardar archivo\""
         val TEXT_ALERT_DIALOG_UPDATE_OK: String = "Se ha actualizado correctamente el registro, para mantener los cambios favor de presionar el boton \"Guardar archivo\""
         val TEXT_ALERT_DIALOG_FILTERS_OK: String = "Se ha guardado correctamente la configuracion de filtros"
+        val TEXT_ALERT_DIALOG_MAIN_SAVE: String = "Se ha guardado correctamente los registros en el archivo"
         val TEXT_CHECK_TITLE: String = "Titulo";
         val TEXT_CHECK_USER: String = "Usuario";
         val TEXT_CHECK_COMMENTS: String = "Comentarios";
