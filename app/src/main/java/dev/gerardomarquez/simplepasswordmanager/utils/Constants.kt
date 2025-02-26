@@ -12,6 +12,8 @@ class Constants {
         val HEADER_DATA_INSERT: String = "Insertar datos";
         val HEADER_DATA_UPDATE: String = "Actualizar datos";
         val HEADER_FILTERS: String = "Configuración de filtros de busqueda";
+        val HEADER_NEW_FILE_EXPLORER: String = "Selecciona la carpeta de guardado";
+        val HEADER_OPEN_FILE_EXPLORER: String = "Selecciona un archivo para visualizarlo";
 
         /**
          * Descripciones de imageners
@@ -46,6 +48,16 @@ class Constants {
         val WEIGHT_LAYOUT_INFORMATION_DROPDOWN: Float = 0.45f
         val WEIGHT_LAYOUT_BUTTONS_DROPDOWN: Float = 0.375f
         val WEIGHT_LAYOUT_BUTTONS_SPACER_DROPDOWN: Float = 0.15f
+        val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_MAIN_ROWS: Float = 0.09f
+        val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_MAIN_ROW: Float = 0.8f
+        val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_PATH_ROW: Float = 0.02f
+        val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_BUTTONS: Float = 0.45f
+        val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_BUTTONS_SPACER: Float = 0.1f
+        val WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_MAIN_ROWS: Float = 0.09f
+        val WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_MAIN_ROW: Float = 0.8f
+        val WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_PATH_ROW: Float = 0.02f
+        val WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_BUTTONS: Float = 0.45f
+        val WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_BUTTONS_SPACER: Float = 0.1f
 
         /**
          * Descripcion de los widgets para que le entienda el usuario
@@ -56,7 +68,9 @@ class Constants {
         val DESCRIPTION_PASSWORD: String = "Contraseña";
         val DESCRIPTION_PASSWORD_VISIBILITY: String = "Boton para ocultar o mostrar contraseña/token"
         val DESCRIPTION_ICON_SEARCH: String = "Lupa de busqueda"
-        val DESCRIPTION_ICON_FILTER: String = "Lupa de busqueda"
+        val DESCRIPTION_ICON_FILTER: String = "Filtro de busqueda"
+        val DESCRIPTION_FOLDER_SELECTED: String = "Seleccionar folder"
+        val DESCRIPTION_FILE_SELECTED: String = "Seleccionar archivo"
         val DESCRIPTION_ICON_NEW: String = "Abrir explorador de archivos"
         val DESCRIPTION_DATA_INPUT_TITLE: String = "Ej. Cuenta de Facebook"
         val DESCRIPTION_DATA_INPUT_USER: String = "Ej. JuanP096"
@@ -80,6 +94,7 @@ class Constants {
         val SIZE_TEXT_PLACE_HOLDER: Int = 10;
         val SIZE_TEXT_TITLE_DROPDOWN: Int = 16;
         val SIZE_TEXT_VALUES_DROPDOWN: Int = 14;
+        val SIZE_TEXT_PATH: Int = 10;
 
         /**
          * Tamaños de spaces
@@ -97,6 +112,8 @@ class Constants {
         val TEXT_BUTTON_SAVE_FILE: String = "Guardar archivo";
         val TEXT_BUTTON_NEW_INSERT: String = "Insertar nuevo";
         val TEXT_BUTTON_SAVE_FILTERS: String = "Guardar filtros";
+        val TEXT_BUTTON_SELECT: String = "Seleccionar"
+        val TEXT_BUTTON_SELECT_FILE: String = "Seleccionar archivo"
         val TEXT_INSERT_VIEW_INSTRUCTIONS: String = "Los campos marcados con \"*\" son obligatorios y el campo titulo debe ser unico"
         val TEXT_ALERT_DIALOG_INSERT_OK: String = "Se ha insertado correctamente el registro, para mantener los cambios favor de presionar el boton \"Guardar archivo\""
         val TEXT_ALERT_DIALOG_UPDATE_OK: String = "Se ha actualizado correctamente el registro, para mantener los cambios favor de presionar el boton \"Guardar archivo\""
@@ -125,6 +142,12 @@ class Constants {
         val DP_HEIGHT_PASSWORDS_DROPDOWN: Int = 70
         val DP_ROUNDED_ROW: Int = 4
         val DP_PADDING_INFORMATION_DROPDOWN: Int = 16
+        val DP_SIZE_ROW_FOLDERS: Int = 90
+        val DP_SIZE_ROW_FOLDERS_PADDING: Int = 10
+        val DP_SIZE_ROW_FOLDERS_SPACER: Int = 15
+        val DP_SIZE_ROW_FILES: Int = 90
+        val DP_SIZE_ROW_FILES_PADDING: Int = 10
+        val DP_SIZE_ROW_FILES_SPACER: Int = 15
 
         /**
          * Texts
