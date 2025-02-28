@@ -37,22 +37,26 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import dev.gerardomarquez.simplepasswordmanager.navigations.Routes
 
 /**
  * Metodo principal que encapsulara todos los elementos de la vista para realizar el login de la
  * aplicacion
  * @param modifier Modificador que se insertara desde el metodo padre
+ * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
-fun Login(modifier: Modifier) {
+fun Login(modifier: Modifier, navigationController: NavHostController) {
     var password by rememberSaveable { mutableStateOf(value = String()) }
+
     // Variables para el dropdown
     val options = listOf(Constants.DESCRIPTION_DROPDOWN_LOGIN, "Opción 2", "Opción 3")
     var selectedOption by rememberSaveable { mutableStateOf(options[Constants.GLOBAL_START_INDEX]) }
 
     Column(
-        modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
-            .fillMaxSize()
+        modifier = modifier
             .padding(horizontal = Constants.DP_PADDING.dp, vertical = Constants.DP_PADDING.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -99,7 +103,13 @@ fun Login(modifier: Modifier) {
                     Column(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_DROP_DOWN_BUTTON)
                     ){
-                        ButtonOpen()
+                        ButtonOpen(
+                            onClick = {
+                                navigationController.navigate(
+                                    route = Routes.ScreenFolderFileExplorer.route
+                                )
+                            }
+                        )
                     }
                 }
                 Row(
@@ -117,7 +127,11 @@ fun Login(modifier: Modifier) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    ButtonLogin()
+                    ButtonLogin(
+                        onClick = {
+                            navigationController.navigate(route = Routes.ScreenMain.route)
+                        }
+                    )
                 }
                 Spacer(
                     modifier = Modifier.fillMaxWidth().weight(Constants.SIZE_SPACE_WEIGHT_LAST_LOGIN)
@@ -127,7 +141,11 @@ fun Login(modifier: Modifier) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.End
                 ) {
-                    ButtonNew()
+                    ButtonNew(
+                        onClick = {
+                            navigationController.navigate(route = Routes.ScreenNewFileExplorer.route)
+                        }
+                    )
                 }
             }
         }
@@ -219,14 +237,14 @@ fun DataBasesDropDown(
  * Boton para abrir el explorador de archivos y buscar una base de datos en especifico
  */
 @Composable
-fun ButtonOpen() {
+fun ButtonOpen(onClick: () -> Unit) {
     val icon = painterResource(R.drawable.folder_open_svgrepo_com)
     Icon(
         painter = icon,
         contentDescription = Constants.DESCRIPTION_ICON_OPEN,
-        modifier = Modifier.fillMaxSize().clickable {
-            Log.i("aqui debe ir la logica", "logica...")
-        }
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(onClick = onClick)
     )
 }
 
@@ -265,12 +283,12 @@ fun Password(password: String, onPasswordChange: (String) -> Unit) {
  * Boton para ingresar
  */
 @Composable
-fun ButtonLogin() {
+fun ButtonLogin(onClick: () -> Unit) {
     OutlinedButton(
         modifier = Modifier
             .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_WIDTH_LOGIN_BUTTON)
             .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_HEIGTH_LOGIN_BUTTON),
-        onClick = {Log.i("aqui debe ir la logica", "logica...")},
+        onClick = onClick,
         shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp)
     ) {
         Text(text = Constants.TEXT_LOGIN)
@@ -281,14 +299,14 @@ fun ButtonLogin() {
  * Boton para crear una nueva base de datos donde guardar los passwords
  */
 @Composable
-fun ButtonNew() {
+fun ButtonNew(onClick: () -> Unit) {
     val icon = painterResource(R.drawable.document_medicine_svgrepo_com)
     Icon(
         painter = icon,
         contentDescription = Constants.DESCRIPTION_ICON_NEW,
-        modifier = Modifier.fillMaxHeight().clickable {
-            Log.i("aqui debe ir la logica", "logica...")
-        }
+        modifier = Modifier
+            .fillMaxHeight()
+            .clickable(onClick = onClick)
     )
 }
 
@@ -297,7 +315,12 @@ fun ButtonNew() {
     showBackground = true
 )
 fun LoginPreview(){
-    Login(modifier = Modifier.fillMaxSize())
+    val navigationController = rememberNavController()
+    Login(
+        modifier = Modifier
+            .fillMaxSize(),
+        navigationController
+    )
     // Mas adelante hay que ver si podemos mandar error en el caso de que los datos esten erroneos
     // con un cuadro de dialogo o notificacion
 }

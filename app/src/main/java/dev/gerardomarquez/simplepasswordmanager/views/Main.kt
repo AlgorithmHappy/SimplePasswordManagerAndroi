@@ -54,7 +54,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import dev.gerardomarquez.simplepasswordmanager.R
+import dev.gerardomarquez.simplepasswordmanager.navigations.Routes
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
 /**
@@ -62,9 +65,10 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
  * sera la pantalla que enlista todas las contraseñas guardadas
  * @param modifier Modificador que contendra el padding y el maximo de pantalla de quien lo mande
  * a llamar
+ * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
-fun Main(modifier: Modifier){
+fun Main(modifier: Modifier, navigationController: NavHostController){
     val scrollState = rememberScrollState()
     val density = LocalDensity.current // Obtener la densidad de la pantalla
     var textSearch by rememberSaveable { mutableStateOf( value = String() ) }
@@ -83,7 +87,7 @@ fun Main(modifier: Modifier){
     var showDialogDelate by rememberSaveable { mutableStateOf(value = false)}
 
     Column(
-        modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
+        modifier = modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
             .fillMaxSize()
             .padding(
                 horizontal = Constants.DP_PADDING.dp,
@@ -123,7 +127,7 @@ fun Main(modifier: Modifier){
                 modifier = Modifier
                     .weight(Constants.WEIGHT_LAYOUT_ICON_FILTER)
                     .clickable {
-
+                        navigationController.navigate(route = Routes.ScreenFilters.route)
                     }
             )
         }
@@ -177,7 +181,9 @@ fun Main(modifier: Modifier){
                                 .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp),
                             information = information,
                             showDialog = showDialogDelate,
-                            onClickOk = {},
+                            onClickOk = {
+                                navigationController.navigate(route = Routes.ScreenUpdatePassword.route)
+                            },
                             onClickDelate = {
                                 showDialogDelate = true
                             }
@@ -196,7 +202,7 @@ fun Main(modifier: Modifier){
                     .weight(Constants.WEIGHT_LAYOUT_MAIN_BUTTONS)
                     .fillMaxHeight(),
                 onClick = {
-
+                    navigationController.navigate(route = Routes.ScreenInsertPassword.route)
                 }
             )
             Spacer(
@@ -750,5 +756,9 @@ data class DataPassword(
     showBackground = true
 )
 fun MainPreview(){
-    Main(modifier = Modifier.fillMaxSize())
+    val navigationController = rememberNavController()
+    Main(
+        modifier = Modifier.fillMaxSize(),
+        navigationController = navigationController
+    )
 }

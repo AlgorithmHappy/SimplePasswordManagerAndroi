@@ -24,7 +24,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import dev.gerardomarquez.simplepasswordmanager.R
+import dev.gerardomarquez.simplepasswordmanager.navigations.Routes
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
 /**
@@ -33,12 +36,14 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
  * guardar la nueva base de datos que almacenara las contraseñas
  * @param modifier Modificador que contendra el padding y el maximo de pantalla de quien lo mande
  * a llamar
+ * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
-fun OpenFileExplorerView(modifier: Modifier){
+fun OpenFileExplorerView(modifier: Modifier, navigationController: NavHostController){
     val scrollState = rememberScrollState()
     Column(
         modifier = modifier
+            .padding(Constants.DP_PADDING.dp)
     ) {
         Row(
             modifier = Modifier
@@ -68,6 +73,7 @@ fun OpenFileExplorerView(modifier: Modifier){
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(Constants.WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_MAIN_ROW)
+                .padding(vertical = Constants.DP_SIZE_ROW_FOLDERS_PADDING.dp)
         ){
             Column(
                 modifier = Modifier
@@ -103,7 +109,9 @@ fun OpenFileExplorerView(modifier: Modifier){
                 modifier = Modifier
                     .weight(weight = Constants.WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_BUTTONS)
                     .fillMaxHeight(),
-                onClick = {}
+                onClick = {
+                    navigationController.navigate(route = Routes.ScreenLogin.route)
+                }
             )
             Spacer(
                 modifier = Modifier
@@ -246,10 +254,11 @@ fun OpenButtonCancel(modifier: Modifier, onClick: () -> Unit){
     showBackground = true
 )
 fun OpenFileExplorerPreview(){
+    val navigationController = rememberNavController()
     OpenFileExplorerView(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(Constants.DP_PADDING.dp)
+            .fillMaxSize(),
+        navigationController = navigationController
     )
 }
 

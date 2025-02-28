@@ -37,16 +37,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import dev.gerardomarquez.simplepasswordmanager.R
+import dev.gerardomarquez.simplepasswordmanager.navigations.Routes
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
 /**
  * Metodo principal donde se encuentra toda la estructura y los datos que se utilizan para la vista
  * de actualizacion de datos
  * @param modifier Modificador que se jalara del metodo padre
+ * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
-fun DataUpdate(modifier: Modifier){
+fun DataUpdate(modifier: Modifier, navigationController: NavHostController){
     var title by rememberSaveable { mutableStateOf(value = String()) }
     var user by rememberSaveable { mutableStateOf(value = String()) }
     var password by rememberSaveable { mutableStateOf(value = String()) }
@@ -292,7 +296,11 @@ fun DataUpdate(modifier: Modifier){
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                ButtonCancelUpdate()
+                ButtonCancelUpdate(
+                    onClick = {
+                        navigationController.navigate(route = Routes.ScreenMain.route)
+                    }
+                )
             }
             Spacer(modifier = Modifier.weight(0.1f))
             Column(
@@ -412,15 +420,14 @@ fun ButtonOkUpdate(onClick: () -> Unit){
 
 /**
  * Boton para cancelar la accion de la pantalla
+ * @param onClick Metodo que se ejecuta al presionar el boton
  */
 @Composable
-fun ButtonCancelUpdate(){
+fun ButtonCancelUpdate(onClick: () -> Unit){
     OutlinedButton(
         modifier = Modifier.fillMaxSize(),
         shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
-        onClick = {
-            Log.i("logica:", "Aqui se hara la logica de guardar los datos en SQLite")
-        }
+        onClick = onClick
     ) {
         Text(text = Constants.TEXT_BUTTON_CANCEL)
     }
@@ -479,5 +486,9 @@ fun SaveAlertDialogUpdate(show: Boolean, onDismissRequest: () -> Unit){
     showBackground = true
 )
 fun DataUpdatePreview(){
-    DataUpdate(modifier = Modifier.fillMaxSize())
+    val navigationController = rememberNavController()
+    DataUpdate(
+        modifier = Modifier.fillMaxSize(),
+        navigationController = navigationController
+    )
 }

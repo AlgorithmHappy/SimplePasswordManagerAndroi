@@ -1,6 +1,5 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,16 +36,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import dev.gerardomarquez.simplepasswordmanager.R
+import dev.gerardomarquez.simplepasswordmanager.navigations.Routes
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
 /**
  * Metodo principal donde se encuentra toda la estructura y los datos que se utilizan para la vista
  * de insertar datos
  * @param modifier Modificador que se jalara del metodo padre
+ * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
-fun DataInsert(modifier: Modifier){
+fun DataInsert(modifier: Modifier, navigationController: NavHostController){
     var title by rememberSaveable { mutableStateOf(value = String()) }
     var user by rememberSaveable { mutableStateOf(value = String()) }
     var password by rememberSaveable { mutableStateOf(value = String()) }
@@ -59,7 +61,7 @@ fun DataInsert(modifier: Modifier){
     var confirmationDialog by rememberSaveable { mutableStateOf(value = false) }
 
     Column(
-        modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
+        modifier = modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
             .fillMaxSize()
             .padding(horizontal = Constants.DP_PADDING.dp, vertical = Constants.DP_PADDING.dp),
         verticalArrangement = Arrangement.Center,
@@ -293,7 +295,11 @@ fun DataInsert(modifier: Modifier){
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                ButtonCancelInsert()
+                ButtonCancelInsert(
+                    onClick = {
+                        navigationController.navigate(route = Routes.ScreenMain.route)
+                    }
+                )
             }
             Spacer(modifier = Modifier.weight(0.1f))
             Column(
@@ -412,15 +418,14 @@ fun ButtonOkInsert(onClick: () -> Unit){
 
 /**
  * Boton para cancelar la accion de la pantalla
+ * @param onClick Metodo que se ejecuta al presionar el boton
  */
 @Composable
-fun ButtonCancelInsert(){
+fun ButtonCancelInsert(onClick: () -> Unit){
     OutlinedButton(
         modifier = Modifier.fillMaxSize(),
         shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
-        onClick = {
-            Log.i("logica:", "Aqui se hara la logica de guardar los datos en SQLite")
-        }
+        onClick = onClick
     ) {
         Text(text = Constants.TEXT_BUTTON_CANCEL)
     }
@@ -479,5 +484,9 @@ fun SaveAlertDialogInsert(show: Boolean, onDismissRequest: () -> Unit){
     showBackground = true
 )
 fun DataInsertPreview(){
-    DataInsert(modifier = Modifier.fillMaxSize())
+    val navigationController = rememberNavController()
+    DataInsert(
+        modifier = Modifier.fillMaxSize(),
+        navigationController = navigationController
+    )
 }

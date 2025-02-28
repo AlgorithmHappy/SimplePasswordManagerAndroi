@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -29,15 +30,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import dev.gerardomarquez.simplepasswordmanager.navigations.Routes
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
 /**
  * Metodo principal que ordena todos los elementos y variables que contendra la pantalla "Filters"
  * @param modifier Modificador que contendra el padding y el maximo de pantalla de quien lo mande
  * a llamar
+ * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
-fun Filters(modifier: Modifier){
+fun Filters(modifier: Modifier, navigationController: NavHostController){
     var titleSelected by rememberSaveable { mutableStateOf(value = false) }
     var dataTitle: CheckDataFilters = CheckDataFilters(
         title = Constants.TEXT_CHECK_TITLE,
@@ -89,7 +94,7 @@ fun Filters(modifier: Modifier){
     var confirmationDialog by rememberSaveable { mutableStateOf(value = false)}
 
     Column(
-        modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
+        modifier = modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
             .fillMaxSize()
             .padding(
                 horizontal = Constants.DP_PADDING.dp,
@@ -133,8 +138,9 @@ fun Filters(modifier: Modifier){
 
     DialogFilters(
         show = confirmationDialog,
-        onDismissRequest = {
+        onClickCancel = {
             confirmationDialog = false
+            //navigationController.navigate(route = Routes.ScreenMain.route)
         }
     )
 }
@@ -204,13 +210,13 @@ fun ButtonSaveFilters(onClick: () -> Unit){
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DialogFilters(show: Boolean, onDismissRequest: () -> Unit){
+fun DialogFilters(show: Boolean, onClickCancel: () -> Unit){
     if(show) {
         BasicAlertDialog(
             modifier = Modifier
                 .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_WIDTH)
                 .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_HEIGHT),
-            onDismissRequest = onDismissRequest,
+            onDismissRequest = {},
         ) {
             Column(
                 modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
@@ -228,7 +234,12 @@ fun DialogFilters(show: Boolean, onDismissRequest: () -> Unit){
                     text = Constants.TEXT_ALERT_DIALOG_FILTERS_OK,
                     textAlign = TextAlign.Center
                 )
-
+                OutlinedButton(
+                    shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
+                    onClick = onClickCancel
+                ) {
+                    Text(text = Constants.TEXT_BUTTON_CANCEL)
+                }
             }
         }
     }
@@ -248,5 +259,9 @@ data class CheckDataFilters(
     showBackground = true
 )
 fun FiltersPreview(){
-    Filters(modifier = Modifier.fillMaxSize())
+    val navigationController = rememberNavController()
+    Filters(
+        modifier = Modifier.fillMaxSize(),
+        navigationController = navigationController
+    )
 }

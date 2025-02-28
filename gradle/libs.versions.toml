@@ -10,6 +10,7 @@ activityCompose = "1.10.0"
 composeBom = "2024.04.01"
 constraintVersion = "1.1.0"
 dataStoreVersion = "1.0.0"
+navigationVersion = "2.5.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -28,6 +29,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 constraint-layaut = {module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintVersion"}
 data-store = {module = "androidx.datastore:datastore-preferences", version.ref = "dataStoreVersion"}
+androidx-navigation = {module = "androidx.navigation:navigation-compose", version.ref = "navigationVersion"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
