@@ -48,7 +48,12 @@ import dev.gerardomarquez.simplepasswordmanager.navigations.Routes
  * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
-fun Login(modifier: Modifier, navigationController: NavHostController) {
+fun Login(
+    modifier: Modifier,
+    /*navigationController: NavHostController*/
+    navigateToFolderFileExplorer: () -> Unit,
+    navigateToMain: () -> Unit,
+    navigateToNewFileExplorer: () -> Unit) {
     var password by rememberSaveable { mutableStateOf(value = String()) }
 
     // Variables para el dropdown
@@ -104,11 +109,11 @@ fun Login(modifier: Modifier, navigationController: NavHostController) {
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_DROP_DOWN_BUTTON)
                     ){
                         ButtonOpen(
-                            onClick = {
+                            onClick = navigateToFolderFileExplorer/*{
                                 navigationController.navigate(
                                     route = Routes.ScreenFolderFileExplorer.route
                                 )
-                            }
+                            }*/
                         )
                     }
                 }
@@ -128,9 +133,9 @@ fun Login(modifier: Modifier, navigationController: NavHostController) {
                     horizontalArrangement = Arrangement.Center
                 ) {
                     ButtonLogin(
-                        onClick = {
+                        onClick = navigateToMain/*{
                             navigationController.navigate(route = Routes.ScreenMain.route)
-                        }
+                        }*/
                     )
                 }
                 Spacer(
@@ -142,9 +147,9 @@ fun Login(modifier: Modifier, navigationController: NavHostController) {
                     horizontalArrangement = Arrangement.End
                 ) {
                     ButtonNew(
-                        onClick = {
+                        onClick = navigateToNewFileExplorer/*{
                             navigationController.navigate(route = Routes.ScreenNewFileExplorer.route)
-                        }
+                        }*/
                     )
                 }
             }
@@ -310,7 +315,7 @@ fun ButtonNew(onClick: () -> Unit) {
     )
 }
 
-@Composable
+/*@Composable
 @Preview(
     showBackground = true
 )
@@ -323,7 +328,7 @@ fun LoginPreview(){
     )
     // Mas adelante hay que ver si podemos mandar error en el caso de que los datos esten erroneos
     // con un cuadro de dialogo o notificacion
-}
+}*/
 
 
 

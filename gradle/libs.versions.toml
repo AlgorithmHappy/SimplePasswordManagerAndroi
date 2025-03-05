@@ -10,7 +10,8 @@ activityCompose = "1.10.0"
 composeBom = "2024.04.01"
 constraintVersion = "1.1.0"
 dataStoreVersion = "1.0.0"
-navigationVersion = "2.5.1"
+navigationVersion = "2.8.2"
+kotlinSerializationVersion = "1.7.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -30,9 +31,11 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 constraint-layaut = {module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintVersion"}
 data-store = {module = "androidx.datastore:datastore-preferences", version.ref = "dataStoreVersion"}
 androidx-navigation = {module = "androidx.navigation:navigation-compose", version.ref = "navigationVersion"}
+kotlin-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm", version.ref = "kotlinSerializationVersion"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
 

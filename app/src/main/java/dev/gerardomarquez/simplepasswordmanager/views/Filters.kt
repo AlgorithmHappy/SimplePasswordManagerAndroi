@@ -19,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,6 +30,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.gerardomarquez.simplepasswordmanager.navigations.Routes
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
@@ -42,7 +43,11 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
  * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
-fun Filters(modifier: Modifier, navigationController: NavHostController){
+fun Filters(
+    modifier: Modifier,
+    //navigationController: NavHostController
+    navigateToMain: () -> Unit
+){
     var titleSelected by rememberSaveable { mutableStateOf(value = false) }
     var dataTitle: CheckDataFilters = CheckDataFilters(
         title = Constants.TEXT_CHECK_TITLE,
@@ -141,6 +146,7 @@ fun Filters(modifier: Modifier, navigationController: NavHostController){
         onClickCancel = {
             confirmationDialog = false
             //navigationController.navigate(route = Routes.ScreenMain.route)
+            navigateToMain()
         }
     )
 }
@@ -254,14 +260,27 @@ data class CheckDataFilters(
     var onCheckedChange: (Boolean) -> Unit // Metodo para cambiar la variable "selected"
 )
 
-@Composable
+/*@Composable
 @Preview(
     showBackground = true
 )
 fun FiltersPreview(){
     val navigationController = rememberNavController()
-    Filters(
-        modifier = Modifier.fillMaxSize(),
-        navigationController = navigationController
-    )
-}
+    NavHost(
+        navController = navigationController,
+        startDestination = Routes.ScreenFilters.route
+    ){
+        composable(Routes.ScreenFilters.route){
+            Filters(
+                modifier = Modifier.fillMaxSize(),
+                navigationController = navigationController
+            )
+        }
+        composable(Routes.ScreenMain.route){
+            Main(
+                modifier = Modifier.fillMaxSize(),
+                navigationController = navigationController
+            )
+        }
+    }
+}*/

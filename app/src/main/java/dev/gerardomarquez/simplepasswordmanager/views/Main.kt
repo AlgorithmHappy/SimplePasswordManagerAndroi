@@ -32,12 +32,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -54,10 +52,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import dev.gerardomarquez.simplepasswordmanager.R
-import dev.gerardomarquez.simplepasswordmanager.navigations.Routes
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
 /**
@@ -68,7 +63,12 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
  * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
-fun Main(modifier: Modifier, navigationController: NavHostController){
+fun Main(
+    modifier: Modifier,
+    navigateToFilters: () -> Unit,
+    navigateToInsert: () -> Unit,
+    navigateToUpdate: () -> Unit,
+){
     val scrollState = rememberScrollState()
     val density = LocalDensity.current // Obtener la densidad de la pantalla
     var textSearch by rememberSaveable { mutableStateOf( value = String() ) }
@@ -83,8 +83,9 @@ fun Main(modifier: Modifier, navigationController: NavHostController){
         secretCode = "token codigo secreto000000000000"
     )
     var confirmationDialog by rememberSaveable { mutableStateOf(value = false)}
-    var layoutCoordinates by rememberSaveable { mutableStateOf<LayoutCoordinates?>(value = null) }
+    var layoutCoordinates: LayoutCoordinates? = null
     var showDialogDelate by rememberSaveable { mutableStateOf(value = false)}
+
 
     Column(
         modifier = modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
@@ -93,7 +94,6 @@ fun Main(modifier: Modifier, navigationController: NavHostController){
                 horizontal = Constants.DP_PADDING.dp,
                 vertical = Constants.DP_PADDING.dp
             ),
-        //verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
@@ -126,9 +126,7 @@ fun Main(modifier: Modifier, navigationController: NavHostController){
             IconFilter(
                 modifier = Modifier
                     .weight(Constants.WEIGHT_LAYOUT_ICON_FILTER)
-                    .clickable {
-                        navigationController.navigate(route = Routes.ScreenFilters.route)
-                    }
+                    .clickable(onClick = navigateToFilters)
             )
         }
         Row(
@@ -145,9 +143,9 @@ fun Main(modifier: Modifier, navigationController: NavHostController){
                     .weight(Constants.WEIGHT_LAYOUT_FULL)
                     .verticalScroll(scrollState)
             ){
-                repeat(15){ // Aqui se tendra que modificar para aceptar todos los elementos
+                repeat(times = 15){ // Aqui se tendra que modificar para aceptar todos los elementos
                     var showMenuLongPress by rememberSaveable { mutableStateOf(value = false)}
-                    var menuOffset by remember { mutableStateOf(Offset.Zero) }
+                    var menuOffset: Offset = Offset.Zero
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -181,9 +179,7 @@ fun Main(modifier: Modifier, navigationController: NavHostController){
                                 .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp),
                             information = information,
                             showDialog = showDialogDelate,
-                            onClickOk = {
-                                navigationController.navigate(route = Routes.ScreenUpdatePassword.route)
-                            },
+                            onClickOk = navigateToUpdate,
                             onClickDelate = {
                                 showDialogDelate = true
                             }
@@ -201,9 +197,7 @@ fun Main(modifier: Modifier, navigationController: NavHostController){
                 modifier = Modifier
                     .weight(Constants.WEIGHT_LAYOUT_MAIN_BUTTONS)
                     .fillMaxHeight(),
-                onClick = {
-                    navigationController.navigate(route = Routes.ScreenInsertPassword.route)
-                }
+                onClick = navigateToInsert
             )
             Spacer(
                 modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
@@ -338,7 +332,7 @@ fun InformationPasswordDropDown(
     onClickOk: () -> Unit,
     onClickDelate: () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
         modifier = modifier,
@@ -427,7 +421,7 @@ fun InformationPasswordDropDown(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
 
-                    var textVisible by remember { mutableStateOf(value = false) }
+                    var textVisible by rememberSaveable { mutableStateOf(value = false) }
                     OutlinedTextField(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
                         value = information.password,
@@ -466,7 +460,7 @@ fun InformationPasswordDropDown(
                     Spacer(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
-                    var textVisible by remember { mutableStateOf(value = false) }
+                    var textVisible by rememberSaveable { mutableStateOf(value = false) }
                     OutlinedTextField(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
                         value = information.secretCode,
@@ -751,7 +745,7 @@ data class DataPassword(
     var phone: String, // Titulo del check
 )
 
-@Composable
+/*@Composable
 @Preview(
     showBackground = true
 )
@@ -761,4 +755,4 @@ fun MainPreview(){
         modifier = Modifier.fillMaxSize(),
         navigationController = navigationController
     )
-}
+}*/

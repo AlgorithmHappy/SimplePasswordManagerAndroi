@@ -49,7 +49,11 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
  * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
-fun DataInsert(modifier: Modifier, navigationController: NavHostController){
+fun DataInsert(
+    modifier: Modifier,
+    //navigationController: NavHostController
+    navigateToMain: () -> Unit
+){
     var title by rememberSaveable { mutableStateOf(value = String()) }
     var user by rememberSaveable { mutableStateOf(value = String()) }
     var password by rememberSaveable { mutableStateOf(value = String()) }
@@ -296,9 +300,9 @@ fun DataInsert(modifier: Modifier, navigationController: NavHostController){
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 ButtonCancelInsert(
-                    onClick = {
+                    onClick = navigateToMain/*{
                         navigationController.navigate(route = Routes.ScreenMain.route)
-                    }
+                    }*/
                 )
             }
             Spacer(modifier = Modifier.weight(0.1f))
@@ -479,7 +483,7 @@ fun SaveAlertDialogInsert(show: Boolean, onDismissRequest: () -> Unit){
     }
 }
 
-@Composable
+/*@Composable
 @Preview(
     showBackground = true
 )
@@ -489,4 +493,4 @@ fun DataInsertPreview(){
         modifier = Modifier.fillMaxSize(),
         navigationController = navigationController
     )
-}
+}*/

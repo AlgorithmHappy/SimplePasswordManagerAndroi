@@ -50,7 +50,11 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
  * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
-fun DataUpdate(modifier: Modifier, navigationController: NavHostController){
+fun DataUpdate(
+    modifier: Modifier,
+    //navigationController: NavHostController
+    navigateToMain: () -> Unit
+){
     var title by rememberSaveable { mutableStateOf(value = String()) }
     var user by rememberSaveable { mutableStateOf(value = String()) }
     var password by rememberSaveable { mutableStateOf(value = String()) }
@@ -297,9 +301,9 @@ fun DataUpdate(modifier: Modifier, navigationController: NavHostController){
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 ButtonCancelUpdate(
-                    onClick = {
+                    onClick = navigateToMain/*{
                         navigationController.navigate(route = Routes.ScreenMain.route)
-                    }
+                    }*/
                 )
             }
             Spacer(modifier = Modifier.weight(0.1f))
@@ -481,7 +485,7 @@ fun SaveAlertDialogUpdate(show: Boolean, onDismissRequest: () -> Unit){
     }
 }
 
-@Composable
+/*@Composable
 @Preview(
     showBackground = true
 )
@@ -491,4 +495,4 @@ fun DataUpdatePreview(){
         modifier = Modifier.fillMaxSize(),
         navigationController = navigationController
     )
-}
+}*/

@@ -39,7 +39,11 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
  * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
-fun OpenFileExplorerView(modifier: Modifier, navigationController: NavHostController){
+fun OpenFileExplorerView(
+    modifier: Modifier,
+    //navigationController: NavHostController
+    navigateToLogin: () -> Unit
+){
     val scrollState = rememberScrollState()
     Column(
         modifier = modifier
@@ -109,9 +113,9 @@ fun OpenFileExplorerView(modifier: Modifier, navigationController: NavHostContro
                 modifier = Modifier
                     .weight(weight = Constants.WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_BUTTONS)
                     .fillMaxHeight(),
-                onClick = {
+                onClick = navigateToLogin/*{
                     navigationController.navigate(route = Routes.ScreenLogin.route)
-                }
+                }*/
             )
             Spacer(
                 modifier = Modifier
@@ -249,7 +253,7 @@ fun OpenButtonCancel(modifier: Modifier, onClick: () -> Unit){
     }
 }
 
-@Composable
+/*@Composable
 @Preview(
     showBackground = true
 )
@@ -260,5 +264,5 @@ fun OpenFileExplorerPreview(){
             .fillMaxSize(),
         navigationController = navigationController
     )
-}
+}*/
 

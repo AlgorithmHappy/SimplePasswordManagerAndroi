@@ -1,5 +1,7 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
+import android.os.Environment
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,13 +12,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -24,11 +29,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import dev.gerardomarquez.simplepasswordmanager.R
-import dev.gerardomarquez.simplepasswordmanager.navigations.Routes
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
+import dev.gerardomarquez.simplepasswordmanager.utils.getFolders
 
 /**
  * Metodo principal que ordena todos los elementos y variables que contendra la pantalla
@@ -39,8 +42,13 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
  * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
-fun NewFileExplorerView(modifier: Modifier, navigationController: NavHostController){
-    val scrollState = rememberScrollState()
+fun NewFileExplorerView(
+    modifier: Modifier,
+    navigateToLogin: () -> Unit
+){
+    var folders by rememberSaveable { mutableStateOf(getFolders().toMutableList() ) }
+    var selectedFolder by rememberSaveable { mutableStateOf(value = Environment.getExternalStorageDirectory().absolutePath) }
+
     Column(
         modifier = modifier
             .padding(Constants.DP_PADDING.dp)
@@ -63,10 +71,21 @@ fun NewFileExplorerView(modifier: Modifier, navigationController: NavHostControl
             verticalAlignment = Alignment.CenterVertically
         ){
             NewFullPath(
-                path = "C:/miPrimerNivel/MiSegundoNivel/MiTercerNivel", // Cambiar por el path correcto
+                path = selectedFolder,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_NEW_FILE_EXPLORER_BACK_FOLDER_BUTTON)
                     .align(alignment = Alignment.CenterVertically)
+            )
+            BackFolder(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .align(alignment = Alignment.CenterVertically)
+                    .clickable {
+                        if(!selectedFolder.equals(Environment.getExternalStorageDirectory().absolutePath) ) {
+                            selectedFolder = selectedFolder.substringBeforeLast(Constants.STR_SLASH)
+                            folders = getFolders(path = selectedFolder).toMutableList()
+                        }
+                    }
             )
         }
         Row(
@@ -75,19 +94,24 @@ fun NewFileExplorerView(modifier: Modifier, navigationController: NavHostControl
                 .weight(Constants.WEIGHT_LAYOUT_NEW_FILE_EXPLORER_MAIN_ROW)
                 .padding(vertical = Constants.DP_SIZE_ROW_FILES_PADDING.dp)
         ){
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(state = scrollState)
             ) {
-                repeat(10){
-                    NewSelectedFolder(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(height = Constants.DP_SIZE_ROW_FOLDERS.dp)
-                            .padding(vertical = Constants.DP_SIZE_ROW_FOLDERS_PADDING.dp),
-                        folderName = "Prueba"
-                    )
+                items(folders.size){
+                    it ->
+                        NewSelectedFolder(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(height = Constants.DP_SIZE_ROW_FOLDERS.dp)
+                                .padding(vertical = Constants.DP_SIZE_ROW_FOLDERS_PADDING.dp)
+                                .clickable {
+                                    selectedFolder =
+                                        selectedFolder + Constants.STR_SLASH + folders[it]
+                                    folders = getFolders(path = selectedFolder).toMutableList()
+                                },
+                            folderName = folders[it]
+                        )
                 }
             }
         }
@@ -100,9 +124,7 @@ fun NewFileExplorerView(modifier: Modifier, navigationController: NavHostControl
                 modifier = Modifier
                     .weight(weight = Constants.WEIGHT_LAYOUT_NEW_FILE_EXPLORER_BUTTONS)
                     .fillMaxHeight(),
-                onClick = {
-                    navigationController.navigate(route = Routes.ScreenLogin.route)
-                }
+                onClick = navigateToLogin
             )
             Spacer(
                 modifier = Modifier
@@ -211,16 +233,30 @@ fun NewButtonCancel(modifier: Modifier, onClick: () -> Unit){
     }
 }
 
+/**
+ * Boton que al presionarlo vuelve atras en la carpeta
+ * @param modifier Para configurar el componente
+ * @param onClick Metodo que se ejecutara al presionar el boton
+ */
+@Composable
+fun BackFolder(modifier: Modifier){
+    val icon = painterResource(R.drawable.undo_left_square_svgrepo_com)
+    Icon(
+        painter = icon,
+        contentDescription = Constants.DESCRIPTION_ICON_BACK_FOLDER,
+        modifier = modifier
+    )
+}
+
 @Composable
 @Preview(
     showBackground = true
 )
-fun NewFileExplorerPreview(){
-    val navigationController = rememberNavController()
+fun NewFileExplorerPreview() {
     NewFileExplorerView(
         modifier = Modifier
             .fillMaxSize(),
-        navigationController = navigationController
+        navigateToLogin = {}
     )
 }
 

@@ -48,11 +48,12 @@ class Constants {
         val WEIGHT_LAYOUT_INFORMATION_DROPDOWN: Float = 0.45f
         val WEIGHT_LAYOUT_BUTTONS_DROPDOWN: Float = 0.375f
         val WEIGHT_LAYOUT_BUTTONS_SPACER_DROPDOWN: Float = 0.15f
-        val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_MAIN_ROWS: Float = 0.08f
-        val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_MAIN_ROW: Float = 0.8f
-        val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_PATH_ROW: Float = 0.03f
+        val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_MAIN_ROWS: Float = 0.085f
+        val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_MAIN_ROW: Float = 0.745f
+        val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_PATH_ROW: Float = 0.085f
         val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_BUTTONS: Float = 0.45f
         val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_BUTTONS_SPACER: Float = 0.1f
+        val WEIGHT_LAYOUT_NEW_FILE_EXPLORER_BACK_FOLDER_BUTTON: Float = 0.85f
         val WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_MAIN_ROWS: Float = 0.08f
         val WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_MAIN_ROW: Float = 0.8f
         val WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_PATH_ROW: Float = 0.03f
@@ -72,6 +73,7 @@ class Constants {
         val DESCRIPTION_FOLDER_SELECTED: String = "Seleccionar folder"
         val DESCRIPTION_FILE_SELECTED: String = "Seleccionar archivo"
         val DESCRIPTION_ICON_NEW: String = "Abrir explorador de archivos"
+        val DESCRIPTION_ICON_BACK_FOLDER: String = "Regresar a la carpeta anterior"
         val DESCRIPTION_DATA_INPUT_TITLE: String = "Ej. Cuenta de Facebook"
         val DESCRIPTION_DATA_INPUT_USER: String = "Ej. JuanP096"
         val DESCRIPTION_DATA_INPUT_PASSWORD: String = "Ej. agesIU1705@"
@@ -163,5 +165,9 @@ class Constants {
         val TXT_USER_DROPDOWN: String = "Usuario:"
         val TXT_PASSWORD_DROPDOWN: String = "Contraseña:"
 
+        /**
+         * Variables globales
+         */
+        val STR_SLASH: String = "/"
     }
 }

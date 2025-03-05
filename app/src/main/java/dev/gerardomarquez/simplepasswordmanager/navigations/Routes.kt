@@ -1,15 +1,31 @@
 package dev.gerardomarquez.simplepasswordmanager.navigations
 
+import kotlinx.serialization.Serializable
+
 /**
- * Clase que gestiona todos los ids de las pantallas de la aplicacion
- * @param route Id de la pantalla
+ * Clase que contiene la ruta de la base de datos nueva que se creo, o de una base de datos que el
+ * combobox no tenia y que se agrego
+ * @param pathNewFile Ruta de la base de datos nueva que se creo
+ * @param pathFolderFile Ruta de la base de datos que se agrego
  */
-sealed class Routes(val route: String) {
-    object ScreenLogin: Routes(route = "login")
-    object ScreenFolderFileExplorer: Routes(route = "folder_file_explorer")
-    object ScreenNewFileExplorer: Routes(route = "new_file_explorer")
-    object ScreenMain: Routes(route = "main")
-    object ScreenInsertPassword: Routes(route = "insert_password")
-    object ScreenUpdatePassword: Routes(route = "update_password")
-    object ScreenFilters: Routes(route = "filters")
-}
+@Serializable
+//data class ScreLogin(val pathNewFile: String = "", val pathFolderFile: String = "")
+object ScreLogin
+
+@Serializable
+object ScreFolderFileExplorer
+
+@Serializable
+object ScreNewFileExplorer
+
+@Serializable
+object ScreMain
+
+@Serializable
+object ScreInsertPassword
+
+@Serializable
+object ScreUpdatePassword
+
+@Serializable
+object ScreFilters
