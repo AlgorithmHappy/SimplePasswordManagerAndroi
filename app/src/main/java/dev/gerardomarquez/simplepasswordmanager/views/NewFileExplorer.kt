@@ -1,6 +1,8 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
+import android.content.Context
 import android.os.Environment
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,24 +16,35 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.gerardomarquez.simplepasswordmanager.R
+import dev.gerardomarquez.simplepasswordmanager.repositories.SettingsDataStore
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 import dev.gerardomarquez.simplepasswordmanager.utils.getFolders
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Metodo principal que ordena todos los elementos y variables que contendra la pantalla
@@ -39,7 +52,7 @@ import dev.gerardomarquez.simplepasswordmanager.utils.getFolders
  * guardar la nueva base de datos que almacenara las contraseñas
  * @param modifier Modificador que contendra el padding y el maximo de pantalla de quien lo mande
  * a llamar
- * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
+ * @param navigateToLogin Metodo que se ejecutara al presionar el boton de cancelar
  */
 @Composable
 fun NewFileExplorerView(
@@ -48,6 +61,10 @@ fun NewFileExplorerView(
 ){
     var folders by rememberSaveable { mutableStateOf(getFolders().toMutableList() ) }
     var selectedFolder by rememberSaveable { mutableStateOf(value = Environment.getExternalStorageDirectory().absolutePath) }
+    var showDialog by rememberSaveable { mutableStateOf(value = false) }
+    var fileName by rememberSaveable { mutableStateOf(value = "") }
+    val context: Context = LocalContext.current
+    val listFlow = SettingsDataStore.getDatabasesPaths(context).collectAsState(initial = emptyList())
 
     Column(
         modifier = modifier
@@ -134,10 +151,27 @@ fun NewFileExplorerView(
                 modifier = Modifier
                     .weight(weight = Constants.WEIGHT_LAYOUT_NEW_FILE_EXPLORER_BUTTONS)
                     .fillMaxHeight(),
-                onClick = {}
+                onClick = {
+                    showDialog = true
+                }
             )
         }
     }
+    InsertNameNewFile(
+        show = showDialog,
+        fileName = fileName,
+        onChangeFileName = {it -> fileName = it},
+        onClickOk = {
+            showDialog = false
+            CoroutineScope(Dispatchers.IO).launch {
+                SettingsDataStore.saveDatabasesPaths(context = context, listDatabasesPaths = listFlow.value + fileName)
+            }
+            navigateToLogin()
+        },
+        onClickCancel = {
+            showDialog = false
+        }
+    )
 }
 
 /**
@@ -246,6 +280,74 @@ fun BackFolder(modifier: Modifier){
         contentDescription = Constants.DESCRIPTION_ICON_BACK_FOLDER,
         modifier = modifier
     )
+}
+
+/**
+ * Dialogo con el que se ingresara el nombre de la nueva base de datos
+ * @param show Con esta variable se define si se mostrara o no el dialogo
+ * @param fileName Nombre de la nueva base de datos
+ * @param onChangeFileName Con este metodo se guardara el nombre de la nueva base de datos
+ * @param onClickOk Con este metodo se guardara el nombre de la nueva base de datos
+ * @param onClickCancel Con este metodo se cancela la accion
+ * dialogo
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun InsertNameNewFile(
+    show: Boolean,
+    fileName: String,
+    onChangeFileName: (String) -> Unit,
+    onClickOk: () -> Unit,
+    onClickCancel: () -> Unit
+){
+    if(show) {
+        BasicAlertDialog(
+            modifier = Modifier
+                .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_WIDTH)
+                .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_HEIGHT),
+            onDismissRequest = onClickCancel,
+        ) {
+            Column(
+                modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
+                    .clip(RoundedCornerShape(Constants.DP_ROUNDED_DIALOGS.dp) )
+                    .fillMaxSize()
+                    .background(color = Color.White)
+                    .padding(
+                        horizontal = Constants.DP_PADDING_DIALOGS.dp,
+                        vertical = Constants.DP_PADDING_DIALOGS.dp
+                    ),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = Constants.TEXT_ALERT_DIALOG_NEW_FILE,
+                    textAlign = TextAlign.Center
+                )
+                TextField(
+                    value = fileName,
+                    onValueChange = onChangeFileName
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    OutlinedButton(
+                        shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
+                        onClick = onClickCancel
+                    ) {
+                        Text(text = Constants.TEXT_BUTTON_CANCEL)
+                    }
+                    OutlinedButton(
+                        shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
+                        onClick = onClickOk
+                    ) {
+                        Text(text = Constants.TEXT_BUTTON_OK)
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable

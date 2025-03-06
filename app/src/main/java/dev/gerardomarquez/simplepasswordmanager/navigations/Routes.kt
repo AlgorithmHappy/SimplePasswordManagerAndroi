@@ -9,7 +9,6 @@ import kotlinx.serialization.Serializable
  * @param pathFolderFile Ruta de la base de datos que se agrego
  */
 @Serializable
-//data class ScreLogin(val pathNewFile: String = "", val pathFolderFile: String = "")
 object ScreLogin
 
 @Serializable

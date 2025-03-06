@@ -5,6 +5,7 @@ package dev.gerardomarquez.simplepasswordmanager.utils
  */
 class Constants {
     companion object {
+
         /**
          * Encabezados de todas las vistas que se utilizaran
          */
@@ -122,6 +123,7 @@ class Constants {
         val TEXT_ALERT_DIALOG_FILTERS_OK: String = "Se ha guardado correctamente la configuracion de filtros"
         val TEXT_ALERT_DIALOG_MAIN_SAVE: String = "Se ha guardado correctamente los registros en el archivo"
         val TEXT_ALERT_DIALOG_MAIN_DELATE: String = "¿Seguro que quieres eliminar el archivo?"
+        val TEXT_ALERT_DIALOG_NEW_FILE: String = "Ingrese el nombre del archivo"
         val TEXT_CHECK_TITLE: String = "Titulo";
         val TEXT_CHECK_USER: String = "Usuario";
         val TEXT_CHECK_COMMENTS: String = "Comentarios";
@@ -130,6 +132,13 @@ class Constants {
         val TEXT_CHECK_PHONE: String = "Telefono de recuperacion";
         val TEXT_FILTERS_INSTRUCTIONS: String = "*Al menos un filtro deberia estar activo";
         val TEXT_MAIN: String = "Lista de contraseñas"
+        val TEXT_BUTTON_OK: String = "Aceptar"
+
+        /**
+         * Textos de propiedades de configuracion
+         */
+        val SETTINGS_FILE_NAME: String = "settings_prefs"
+        val SETTINGS_LIST_DATABASES: String = "database_list"
 
         /**
          * Tamaños de dp's
@@ -169,5 +178,6 @@ class Constants {
          * Variables globales
          */
         val STR_SLASH: String = "/"
+        val STR_CORCHETES: String = "[]"
     }
 }
