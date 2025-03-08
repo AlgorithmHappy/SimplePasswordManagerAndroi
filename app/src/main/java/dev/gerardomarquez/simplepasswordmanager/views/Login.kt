@@ -1,5 +1,6 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,30 +32,45 @@ import dev.gerardomarquez.simplepasswordmanager.R
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
+import dev.gerardomarquez.simplepasswordmanager.repositories.SettingsDataStore
+import kotlinx.coroutines.flow.map
 
 /**
  * Metodo principal que encapsulara todos los elementos de la vista para realizar el login de la
  * aplicacion
  * @param modifier Modificador que se insertara desde el metodo padre
- * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
+ * @param navigateT Objeto que gestiona la navegacion entre pantallas de la aplicacion
  */
 @Composable
 fun Login(
     modifier: Modifier,
-    /*navigationController: NavHostController*/
-    navigateToFolderFileExplorer: () -> Unit,
     navigateToMain: () -> Unit,
-    navigateToNewFileExplorer: () -> Unit) {
+    navigateToFolderFileExplorer: () -> Unit,
+    navigateToNewFileExplorer: () -> Unit
+) {
+    val context: Context = LocalContext.current
     var password by rememberSaveable { mutableStateOf(value = String()) }
 
     // Variables para el dropdown
-    val options = listOf(Constants.DESCRIPTION_DROPDOWN_LOGIN, "Opción 2", "Opción 3")
-    var selectedOption by rememberSaveable { mutableStateOf(options[Constants.GLOBAL_START_INDEX]) }
+    val options = SettingsDataStore.getDatabasesPaths(context)
+        .map { iterator -> iterator.map {
+            innerIterator -> innerIterator.split(Constants.STR_SLASH).last() }
+        } // Borra el path y deja solo el nombre de la base de datos
+        .collectAsState(initial = emptyList())
+    var strSelectOption: String
+    if(options.value.isEmpty()){
+        strSelectOption = Constants.GLOBAL_SELECCIONAR
+    } else {
+        strSelectOption = options.value.get(Constants.GLOBAL_START_INDEX).split(Constants.STR_SLASH).last()
+    }
+    var selectedOption by rememberSaveable { mutableStateOf(strSelectOption) }
 
     Column(
         modifier = modifier
@@ -94,7 +110,7 @@ fun Login(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_DROP_DOWN)
                     ){
                         DataBasesDropDown(
-                            options = options,
+                            options = options.value,
                             selectedOption = selectedOption,
                             onOptionSelected = {
                                 selectedOption = it

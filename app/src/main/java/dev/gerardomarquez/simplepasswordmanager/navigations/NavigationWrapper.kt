@@ -1,7 +1,5 @@
 package dev.gerardomarquez.simplepasswordmanager.navigations
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -15,6 +13,10 @@ import dev.gerardomarquez.simplepasswordmanager.views.Main
 import dev.gerardomarquez.simplepasswordmanager.views.NewFileExplorerView
 import dev.gerardomarquez.simplepasswordmanager.views.OpenFileExplorerView
 
+/**
+ * Clase que gestionara la navegacion entre pantallas de la aplicacion
+ * @param modifier Modificador que se aplicara a todas las pantallas que se agreguen
+ */
 @Composable
 fun NavigationWrapper(modifier: Modifier){
     val navigationController = rememberNavController()
@@ -28,11 +30,11 @@ fun NavigationWrapper(modifier: Modifier){
                 navigateToMain = {
                     navigationController.navigate(ScreMain)
                 },
-                navigateToNewFileExplorer = {
-                    navigationController.navigate(ScreNewFileExplorer)
-                },
                 navigateToFolderFileExplorer = {
                     navigationController.navigate(ScreFolderFileExplorer)
+                },
+                navigateToNewFileExplorer = {
+                    navigationController.navigate(ScreNewFileExplorer)
                 }
             )
         }

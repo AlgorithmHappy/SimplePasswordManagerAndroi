@@ -1,5 +1,8 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
+import android.os.Environment
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -17,14 +22,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.gerardomarquez.simplepasswordmanager.R
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
+import dev.gerardomarquez.simplepasswordmanager.utils.getFiles
+import dev.gerardomarquez.simplepasswordmanager.utils.getFolders
+import java.util.Arrays.asList
 
 /**
  * Metodo principal que ordena todos los elementos y variables que contendra la pantalla
@@ -32,15 +46,19 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
  * guardar la nueva base de datos que almacenara las contraseñas
  * @param modifier Modificador que contendra el padding y el maximo de pantalla de quien lo mande
  * a llamar
- * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
+ * @param navigateToLogin Metodo que se ejecutara al presionar el boton de cancelar y navegar al login
  */
 @Composable
 fun OpenFileExplorerView(
     modifier: Modifier,
-    //navigationController: NavHostController
     navigateToLogin: () -> Unit
 ){
-    val scrollState = rememberScrollState()
+    var currentPath by rememberSaveable { mutableStateOf(value = Environment.getExternalStorageDirectory().absolutePath) }
+    var foldersAndFiles by rememberSaveable { mutableStateOf(value = getFolders() + getFiles() ) }
+    var currentColor by rememberSaveable { mutableStateOf(value = Color.White.toArgb() ) }
+    var selectedIndexFile by rememberSaveable { mutableStateOf(value = 0) }
+    val color = Color(currentColor)
+    //val scrollState = rememberScrollState()
     Column(
         modifier = modifier
             .padding(Constants.DP_PADDING.dp)
@@ -63,7 +81,7 @@ fun OpenFileExplorerView(
             verticalAlignment = Alignment.CenterVertically
         ){
             OpenFullPath(
-                path = "C:/miPrimerNivel/MiSegundoNivel/MiTercerNivel", // Cambiar por el path correcto
+                path = currentPath,
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(alignment = Alignment.CenterVertically)
@@ -75,12 +93,44 @@ fun OpenFileExplorerView(
                 .weight(Constants.WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_MAIN_ROW)
                 .padding(vertical = Constants.DP_SIZE_ROW_FOLDERS_PADDING.dp)
         ){
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(state = scrollState)
             ) {
-                repeat(5){
+                items(foldersAndFiles.size){
+                    it ->
+                    if(foldersAndFiles[it].contains(Constants.GLOBAL_STR_DOT + Constants.GLOBAL_STR_DATABASE_EXTENSION)) {
+                        OpenSelectedFile(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(height = Constants.DP_SIZE_ROW_FILES.dp)
+                                .padding(vertical = Constants.DP_SIZE_ROW_FILES_PADDING.dp)
+                                .background(color)
+                                .clickable {
+                                    // Guardar el color actual antes de cambiarlo
+                                    //previousColor = currentColor
+                                    // Cambiar el color
+                                    //currentColor = if (currentColor == Color.White) Color.Blue else previousColor
+                                    currentColor = if (color == Color.White) Color.Cyan.toArgb() else Color.White.toArgb()
+                                    selectedIndexFile = it
+                                },
+                            folderName = foldersAndFiles[it]
+                        )
+                    } else {
+                        OpenSelectedFolder(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(height = Constants.DP_SIZE_ROW_FILES.dp)
+                                .padding(vertical = Constants.DP_SIZE_ROW_FILES_PADDING.dp)
+                                .clickable {
+                                    currentPath += Constants.STR_SLASH + foldersAndFiles[it]
+                                    foldersAndFiles = getFolders(currentPath) + getFiles(currentPath)
+                                },
+                            folderName = foldersAndFiles[it]
+                        )
+                    }
+                }
+                /*repeat(5){
                     OpenSelectedFile(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -97,7 +147,7 @@ fun OpenFileExplorerView(
                             .padding(vertical = Constants.DP_SIZE_ROW_FILES_PADDING.dp),
                         folderName = "Carpeta"
                     )
-                }
+                }*/
             }
         }
         Row(

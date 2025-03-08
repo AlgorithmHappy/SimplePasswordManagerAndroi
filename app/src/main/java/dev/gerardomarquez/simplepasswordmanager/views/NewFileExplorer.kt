@@ -164,7 +164,11 @@ fun NewFileExplorerView(
         onClickOk = {
             showDialog = false
             CoroutineScope(Dispatchers.IO).launch {
-                SettingsDataStore.saveDatabasesPaths(context = context, listDatabasesPaths = listFlow.value + fileName)
+                val completePath: String = selectedFolder + Constants.STR_SLASH + fileName
+                SettingsDataStore.saveDatabasesPaths(
+                    context = context,
+                    listDatabasesPaths = listFlow.value + completePath
+                )
             }
             navigateToLogin()
         },

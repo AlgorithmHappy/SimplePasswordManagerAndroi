@@ -89,6 +89,11 @@ class Constants {
          * Variables globales
          */
         val GLOBAL_START_INDEX: Int = 0;
+        val GLOBAL_SELECCIONAR: String = "Selecciona una opción"
+        val STR_SLASH: String = "/"
+        val STR_CORCHETES: String = "[]"
+        val GLOBAL_STR_DATABASE_EXTENSION: String = "db"
+        val GLOBAL_STR_DOT: String = "."
 
         /**
          * Tamaños de textos
@@ -174,10 +179,5 @@ class Constants {
         val TXT_USER_DROPDOWN: String = "Usuario:"
         val TXT_PASSWORD_DROPDOWN: String = "Contraseña:"
 
-        /**
-         * Variables globales
-         */
-        val STR_SLASH: String = "/"
-        val STR_CORCHETES: String = "[]"
     }
 }
