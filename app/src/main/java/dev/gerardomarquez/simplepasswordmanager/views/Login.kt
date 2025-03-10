@@ -1,6 +1,7 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -71,6 +72,7 @@ fun Login(
         strSelectOption = options.value.get(Constants.GLOBAL_START_INDEX).split(Constants.STR_SLASH).last()
     }
     var selectedOption by rememberSaveable { mutableStateOf(strSelectOption) }
+
 
     Column(
         modifier = modifier

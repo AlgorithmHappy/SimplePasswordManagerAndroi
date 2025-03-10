@@ -1,5 +1,7 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Environment
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,15 +32,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import dev.gerardomarquez.simplepasswordmanager.R
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 import dev.gerardomarquez.simplepasswordmanager.utils.getFiles
 import dev.gerardomarquez.simplepasswordmanager.utils.getFolders
 import java.util.Arrays.asList
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
 
 /**
  * Metodo principal que ordena todos los elementos y variables que contendra la pantalla
@@ -53,11 +62,35 @@ fun OpenFileExplorerView(
     modifier: Modifier,
     navigateToLogin: () -> Unit
 ){
+    val context: Context = LocalContext.current
     var currentPath by rememberSaveable { mutableStateOf(value = Environment.getExternalStorageDirectory().absolutePath) }
-    var foldersAndFiles by rememberSaveable { mutableStateOf(value = getFolders() + getFiles() ) }
+    var foldersAndFiles by rememberSaveable { mutableStateOf(value = getFolders() + getFiles(context = context) ) }
     var currentColor by rememberSaveable { mutableStateOf(value = Color.White.toArgb() ) }
     var selectedIndexFile by rememberSaveable { mutableStateOf(value = 0) }
     val color = Color(currentColor)
+
+    // Comprueba permisos al inicio
+    /*LaunchedEffect(Unit) {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED) {
+            setHasPermission(true)
+        }
+    }
+
+    // Callback para el resultado de los permisos
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        setHasPermission(isGranted)
+        if (isGranted) {
+            // Permisos concedidos, ahora puedes acceder a los archivos
+            val files = getFiles("/storage/emulated/0")
+            // Haz algo con los archivos...
+        }
+    }*/
+
     //val scrollState = rememberScrollState()
     Column(
         modifier = modifier
@@ -83,8 +116,20 @@ fun OpenFileExplorerView(
             OpenFullPath(
                 path = currentPath,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_BACK_FOLDER_BUTTON)
                     .align(alignment = Alignment.CenterVertically)
+            )
+
+            BackFolderInFolderExplorer(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .align(alignment = Alignment.CenterVertically)
+                    .clickable {
+                        if(!currentPath.equals(Environment.getExternalStorageDirectory().absolutePath) ) {
+                            currentPath = currentPath.substringBeforeLast(Constants.STR_SLASH)
+                            foldersAndFiles = getFolders(path = currentPath).toMutableList() + getFiles(path = currentPath, context = context)
+                        }
+                    }
             )
         }
         Row(
@@ -124,7 +169,7 @@ fun OpenFileExplorerView(
                                 .padding(vertical = Constants.DP_SIZE_ROW_FILES_PADDING.dp)
                                 .clickable {
                                     currentPath += Constants.STR_SLASH + foldersAndFiles[it]
-                                    foldersAndFiles = getFolders(currentPath) + getFiles(currentPath)
+                                    foldersAndFiles = getFolders(currentPath) + getFiles(path = currentPath, context = context)
                                 },
                             folderName = foldersAndFiles[it]
                         )
@@ -297,6 +342,21 @@ fun OpenButtonCancel(modifier: Modifier, onClick: () -> Unit){
             text = Constants.TEXT_BUTTON_CANCEL
         )
     }
+}
+
+/**
+ * Boton que al presionarlo vuelve atras en la carpeta
+ * @param modifier Para configurar el componente
+ * @param onClick Metodo que se ejecutara al presionar el boton
+ */
+@Composable
+fun BackFolderInFolderExplorer(modifier: Modifier){
+    val icon = painterResource(R.drawable.undo_left_square_svgrepo_com)
+    Icon(
+        painter = icon,
+        contentDescription = Constants.DESCRIPTION_ICON_BACK_FOLDER,
+        modifier = modifier
+    )
 }
 
 /*@Composable
