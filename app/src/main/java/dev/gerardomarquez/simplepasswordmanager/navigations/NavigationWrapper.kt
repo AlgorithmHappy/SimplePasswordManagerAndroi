@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import dev.gerardomarquez.simplepasswordmanager.views.DataInsert
 import dev.gerardomarquez.simplepasswordmanager.views.DataUpdate
 import dev.gerardomarquez.simplepasswordmanager.views.Filters
@@ -31,7 +32,8 @@ fun NavigationWrapper(modifier: Modifier){
                     navigationController.navigate(ScreMain)
                 },
                 navigateToFolderFileExplorer = {
-                    navigationController.navigate(ScreFolderFileExplorer)
+                    selectedFolderString ->
+                    navigationController.navigate(ScreFolderFileExplorer(selectedFolderString = selectedFolderString) )
                 },
                 navigateToNewFileExplorer = {
                     navigationController.navigate(ScreNewFileExplorer)
@@ -61,8 +63,11 @@ fun NavigationWrapper(modifier: Modifier){
             )
         }
         composable<ScreFolderFileExplorer> {
+            backStackEntry ->
+            val folderFileExplorer: ScreFolderFileExplorer = backStackEntry.toRoute()
             OpenFileExplorerView(
                 modifier = modifier,
+                selectedFolderString = folderFileExplorer.selectedFolderString,
                 navigateToLogin = {
                     navigationController.popBackStack()
                 }

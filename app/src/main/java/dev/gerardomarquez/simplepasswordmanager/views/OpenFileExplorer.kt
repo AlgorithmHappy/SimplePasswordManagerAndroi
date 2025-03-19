@@ -45,9 +45,13 @@ import dev.gerardomarquez.simplepasswordmanager.utils.getFiles
 import dev.gerardomarquez.simplepasswordmanager.utils.getFolders
 import java.util.Arrays.asList
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 
 /**
  * Metodo principal que ordena todos los elementos y variables que contendra la pantalla
@@ -60,38 +64,31 @@ import androidx.compose.runtime.LaunchedEffect
 @Composable
 fun OpenFileExplorerView(
     modifier: Modifier,
+    selectedFolderString: String,
     navigateToLogin: () -> Unit
 ){
+    Log.d("OpenFileExplorer", "selectedFolderString: $selectedFolderString")
     val context: Context = LocalContext.current
     var currentPath by rememberSaveable { mutableStateOf(value = Environment.getExternalStorageDirectory().absolutePath) }
-    var foldersAndFiles by rememberSaveable { mutableStateOf(value = getFolders() + getFiles(context = context) ) }
     var currentColor by rememberSaveable { mutableStateOf(value = Color.White.toArgb() ) }
     var selectedIndexFile by rememberSaveable { mutableStateOf(value = 0) }
     val color = Color(currentColor)
-
-    // Comprueba permisos al inicio
-    /*LaunchedEffect(Unit) {
-        if (ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED) {
-            setHasPermission(true)
-        }
-    }
-
-    // Callback para el resultado de los permisos
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        setHasPermission(isGranted)
-        if (isGranted) {
-            // Permisos concedidos, ahora puedes acceder a los archivos
-            val files = getFiles("/storage/emulated/0")
-            // Haz algo con los archivos...
+    //var selectedFolderUri by rememberSaveable { mutableStateOf(value = Uri.EMPTY) }
+    //var selectedFolderUri = Uri.EMPTY
+    //var selectedFolderUri by remember { mutableStateOf<Uri?>(value = null) }
+    /*val folderPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri: Uri? ->
+        uri?.let {
+            it ->
+            selectedFolderUri = it
+            context.contentResolver.takePersistableUriPermission(
+                it, Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
         }
     }*/
+    var foldersAndFiles by rememberSaveable { mutableStateOf(value = getFolders() + getFiles(context = context, uri = Uri.parse(selectedFolderString) ) ) }
 
-    //val scrollState = rememberScrollState()
     Column(
         modifier = modifier
             .padding(Constants.DP_PADDING.dp)
@@ -127,7 +124,7 @@ fun OpenFileExplorerView(
                     .clickable {
                         if(!currentPath.equals(Environment.getExternalStorageDirectory().absolutePath) ) {
                             currentPath = currentPath.substringBeforeLast(Constants.STR_SLASH)
-                            foldersAndFiles = getFolders(path = currentPath).toMutableList() + getFiles(path = currentPath, context = context)
+                            foldersAndFiles = getFolders(path = currentPath).toMutableList() + getFiles(context = context, uri = Uri.parse(selectedFolderString) )
                         }
                     }
             )
@@ -144,7 +141,7 @@ fun OpenFileExplorerView(
             ) {
                 items(foldersAndFiles.size){
                     it ->
-                    if(foldersAndFiles[it].contains(Constants.GLOBAL_STR_DOT + Constants.GLOBAL_STR_DATABASE_EXTENSION)) {
+                    if(foldersAndFiles[it]!!.contains(Constants.GLOBAL_STR_DOT + Constants.GLOBAL_STR_DATABASE_EXTENSION)) {
                         OpenSelectedFile(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -159,7 +156,7 @@ fun OpenFileExplorerView(
                                     currentColor = if (color == Color.White) Color.Cyan.toArgb() else Color.White.toArgb()
                                     selectedIndexFile = it
                                 },
-                            folderName = foldersAndFiles[it]
+                            folderName = foldersAndFiles[it]!!
                         )
                     } else {
                         OpenSelectedFolder(
@@ -169,9 +166,9 @@ fun OpenFileExplorerView(
                                 .padding(vertical = Constants.DP_SIZE_ROW_FILES_PADDING.dp)
                                 .clickable {
                                     currentPath += Constants.STR_SLASH + foldersAndFiles[it]
-                                    foldersAndFiles = getFolders(currentPath) + getFiles(path = currentPath, context = context)
+                                    foldersAndFiles = getFolders(currentPath) + getFiles(context = context, uri = Uri.parse(selectedFolderString ) )
                                 },
-                            folderName = foldersAndFiles[it]
+                            folderName = foldersAndFiles[it]!!
                         )
                     }
                 }
@@ -216,7 +213,9 @@ fun OpenFileExplorerView(
                 modifier = Modifier
                     .weight(weight = Constants.WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_BUTTONS)
                     .fillMaxHeight(),
-                onClick = {}
+                onClick = {
+                    //folderPickerLauncher.launch(input = null)
+                }
             )
         }
     }

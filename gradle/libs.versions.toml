@@ -12,6 +12,7 @@ constraintVersion = "1.1.0"
 dataStoreVersion = "1.0.0"
 navigationVersion = "2.8.2"
 kotlinSerializationVersion = "1.7.3"
+documentfile = "1.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +33,7 @@ constraint-layaut = {module = "androidx.constraintlayout:constraintlayout-compos
 data-store = {module = "androidx.datastore:datastore-preferences", version.ref = "dataStoreVersion"}
 androidx-navigation = {module = "androidx.navigation:navigation-compose", version.ref = "navigationVersion"}
 kotlin-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm", version.ref = "kotlinSerializationVersion"}
+androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentfile" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

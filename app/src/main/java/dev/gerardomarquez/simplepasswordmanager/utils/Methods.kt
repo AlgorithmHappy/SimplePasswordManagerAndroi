@@ -7,6 +7,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import androidx.compose.ui.platform.LocalContext
+import androidx.documentfile.provider.DocumentFile
 import java.io.File
 
 /*
@@ -24,14 +25,12 @@ fun getFolders(path: String = Environment.getExternalStorageDirectory().absolute
 * @param path Ruta del directorio que se quiere obtener las carpetas
 * @return Lista de nombres de carpetas y de archivos con su extension (.db) que se encuentran en el directorio
  */
-fun getFiles(path: String = Environment.getExternalStorageDirectory().absolutePath, context: Context): List<String> {
-
-    val directory = File(path)
-    val dbFile = File(directory, "pruebaXDXDXD.db")
-    Log.d("FileDebug", "El archivo específico existe: ${dbFile.exists()}")
-
-    return directory
-        .listFiles()?.filter {
-            it.isFile && it.extension.equals(Constants.GLOBAL_STR_DATABASE_EXTENSION)
-        }?.map { it.name + Constants.GLOBAL_STR_DOT + it.extension } ?: emptyList()
+fun getFiles(context: Context, uri: Uri?): List<String?> {
+    if (uri == null || uri.toString().isBlank() ) return emptyList()  // Si el Uri es nulo o vacia, retornamos una lista vacía
+    val docFile = DocumentFile.fromTreeUri(context, uri)  // Convertimos el Uri en un DocumentFile
+    return docFile?.listFiles()?.map {
+        it -> it.name
+    }?.filter {
+        it -> it!!.endsWith(suffix = Constants.GLOBAL_STR_DOT + Constants.GLOBAL_STR_DATABASE_EXTENSION )
+    }?.toList() ?: emptyList()  // Obtenemos la lista de archivos
 }

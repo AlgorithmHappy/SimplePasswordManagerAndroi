@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.data.store)
     implementation(libs.androidx.navigation)
     implementation(libs.kotlin.serialization.json)
+    implementation(libs.androidx.documentfile)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

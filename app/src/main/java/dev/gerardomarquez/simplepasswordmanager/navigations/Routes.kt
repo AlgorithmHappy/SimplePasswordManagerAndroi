@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 object ScreLogin
 
 @Serializable
-object ScreFolderFileExplorer
+data class ScreFolderFileExplorer(val selectedFolderString: String)
 
 @Serializable
 object ScreNewFileExplorer

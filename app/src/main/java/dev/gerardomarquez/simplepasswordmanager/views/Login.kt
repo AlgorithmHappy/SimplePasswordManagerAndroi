@@ -1,8 +1,11 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -42,6 +45,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
 import dev.gerardomarquez.simplepasswordmanager.repositories.SettingsDataStore
 import kotlinx.coroutines.flow.map
+import android.Manifest.permission
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.core.content.ContextCompat
 
 /**
  * Metodo principal que encapsulara todos los elementos de la vista para realizar el login de la
@@ -53,11 +62,12 @@ import kotlinx.coroutines.flow.map
 fun Login(
     modifier: Modifier,
     navigateToMain: () -> Unit,
-    navigateToFolderFileExplorer: () -> Unit,
+    navigateToFolderFileExplorer: (String) -> Unit,
     navigateToNewFileExplorer: () -> Unit
 ) {
     val context: Context = LocalContext.current
     var password by rememberSaveable { mutableStateOf(value = String()) }
+
 
     // Variables para el dropdown
     val options = SettingsDataStore.getDatabasesPaths(context)
@@ -71,8 +81,20 @@ fun Login(
     } else {
         strSelectOption = options.value.get(Constants.GLOBAL_START_INDEX).split(Constants.STR_SLASH).last()
     }
-    var selectedOption by rememberSaveable { mutableStateOf(strSelectOption) }
-
+    var selectedOption by rememberSaveable { mutableStateOf(value = strSelectOption) }
+    var selectedFolderUriStr by rememberSaveable { mutableStateOf(value = "") }
+    val folderPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri: Uri? ->
+        uri?.let {
+            it ->
+            selectedFolderUriStr = it.toString()
+            context.contentResolver.takePersistableUriPermission(
+                it, Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+            navigateToFolderFileExplorer(selectedFolderUriStr)
+        }
+    }
 
     Column(
         modifier = modifier
@@ -123,11 +145,9 @@ fun Login(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_DROP_DOWN_BUTTON)
                     ){
                         ButtonOpen(
-                            onClick = navigateToFolderFileExplorer/*{
-                                navigationController.navigate(
-                                    route = Routes.ScreenFolderFileExplorer.route
-                                )
-                            }*/
+                            onClick = {
+                                folderPickerLauncher.launch(input = null)
+                            }
                         )
                     }
                 }
@@ -147,9 +167,7 @@ fun Login(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     ButtonLogin(
-                        onClick = navigateToMain/*{
-                            navigationController.navigate(route = Routes.ScreenMain.route)
-                        }*/
+                        onClick = navigateToMain
                     )
                 }
                 Spacer(
@@ -161,9 +179,7 @@ fun Login(
                     horizontalArrangement = Arrangement.End
                 ) {
                     ButtonNew(
-                        onClick = navigateToNewFileExplorer/*{
-                            navigationController.navigate(route = Routes.ScreenNewFileExplorer.route)
-                        }*/
+                        onClick = navigateToNewFileExplorer
                     )
                 }
             }
