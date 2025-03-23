@@ -90,11 +90,14 @@ class Constants {
          * Variables globales
          */
         val GLOBAL_START_INDEX: Int = 0;
+        val GLOBAL_NEGATIVE_NUMBER: Int = -1;
         val GLOBAL_SELECCIONAR: String = "Selecciona una opción"
         val STR_SLASH: String = "/"
         val STR_CORCHETES: String = "[]"
         val GLOBAL_STR_DATABASE_EXTENSION: String = "db"
         val GLOBAL_STR_DOT: String = "."
+        val GLOBAL_STR_URI_TO_PATH: String = "/tree/primary:"
+        val GLOBAL_STR_URI_FOLDER_LEVEL: String = "%2F"
 
         /**
          * Tamaños de textos
@@ -158,6 +161,9 @@ class Constants {
         val DP_PADDING_PASSWORDS_DROPDOWNS_MENUS: Int = 10
         val DP_HEIGHT_PASSWORDS_DROPDOWN: Int = 70
         val DP_ROUNDED_ROW: Int = 4
+        val DP_ROUNDED_SELECT_BORDER: Int = 8
+        val DP_WIDTH_SELECT_BORDER: Int = 3
+        val DP_WIDTH_DESELECT_BORDER: Int = 0
         val DP_PADDING_INFORMATION_DROPDOWN: Int = 16
         val DP_SIZE_ROW_FOLDERS: Int = 90
         val DP_SIZE_ROW_FOLDERS_PADDING: Int = 10

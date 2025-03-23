@@ -1,12 +1,8 @@
 package dev.gerardomarquez.simplepasswordmanager.utils
 
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
 import android.os.Environment
-import android.provider.MediaStore
-import android.util.Log
-import androidx.compose.ui.platform.LocalContext
 import androidx.documentfile.provider.DocumentFile
 import java.io.File
 

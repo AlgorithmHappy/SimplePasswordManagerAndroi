@@ -64,7 +64,6 @@ fun NewFileExplorerView(
     var showDialog by rememberSaveable { mutableStateOf(value = false) }
     var fileName by rememberSaveable { mutableStateOf(value = "") }
     val context: Context = LocalContext.current
-    val listFlow = SettingsDataStore.getDatabasesPaths(context).collectAsState(initial = emptyList())
 
     Column(
         modifier = modifier
@@ -165,9 +164,9 @@ fun NewFileExplorerView(
             showDialog = false
             CoroutineScope(Dispatchers.IO).launch {
                 val completePath: String = selectedFolder + Constants.STR_SLASH + fileName
-                SettingsDataStore.saveDatabasesPaths(
+                SettingsDataStore.saveOneDatabasePath(
                     context = context,
-                    listDatabasesPaths = listFlow.value + completePath
+                    databasePath = completePath
                 )
             }
             navigateToLogin()

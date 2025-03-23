@@ -1,9 +1,6 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -45,12 +42,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
 import dev.gerardomarquez.simplepasswordmanager.repositories.SettingsDataStore
 import kotlinx.coroutines.flow.map
-import android.Manifest.permission
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
-import androidx.core.content.ContextCompat
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.mutableStateListOf
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 
 /**
  * Metodo principal que encapsulara todos los elementos de la vista para realizar el login de la
@@ -67,21 +67,35 @@ fun Login(
 ) {
     val context: Context = LocalContext.current
     var password by rememberSaveable { mutableStateOf(value = String()) }
-
-
     // Variables para el dropdown
-    val options = SettingsDataStore.getDatabasesPaths(context)
-        .map { iterator -> iterator.map {
-            innerIterator -> innerIterator.split(Constants.STR_SLASH).last() }
-        } // Borra el path y deja solo el nombre de la base de datos
+    var options = SettingsDataStore.getDatabasesPaths(context)
+        /*.map {
+            iterator ->
+            iterator.reversed()
+        }*/ // Se invierte la lista para que el usuario vea primero la ultima base de datos con la que trabajo en el combobox
+        .map {
+            iterator ->
+            iterator.map {
+                innerIterator ->
+                innerIterator.split(Constants.STR_SLASH).last()
+            }
+        }
         .collectAsState(initial = emptyList())
-    var strSelectOption: String
-    if(options.value.isEmpty()){
-        strSelectOption = Constants.GLOBAL_SELECCIONAR
-    } else {
-        strSelectOption = options.value.get(Constants.GLOBAL_START_INDEX).split(Constants.STR_SLASH).last()
+
+    var mutableOptions by rememberSaveable { mutableStateOf(mutableListOf<String>() ) }
+    options.value.forEach{
+        iterator ->
+        if(!mutableOptions.contains(iterator) ){
+            mutableOptions.add(Constants.GLOBAL_START_INDEX, iterator)
+        }
     }
-    var selectedOption by rememberSaveable { mutableStateOf(value = strSelectOption) }
+    if (mutableOptions.isEmpty() )
+        mutableOptions.add(Constants.GLOBAL_SELECCIONAR)
+    if (mutableOptions.size > 1 && mutableOptions.contains(Constants.GLOBAL_SELECCIONAR) ) {
+        mutableOptions.remove(Constants.GLOBAL_SELECCIONAR)
+        //selectedOption = mutableOptions.get(Constants.GLOBAL_START_INDEX)
+    }
+    var selectedOption by rememberSaveable { mutableStateOf(value = mutableOptions.get(Constants.GLOBAL_START_INDEX)) }
     var selectedFolderUriStr by rememberSaveable { mutableStateOf(value = "") }
     val folderPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
@@ -134,7 +148,7 @@ fun Login(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_DROP_DOWN)
                     ){
                         DataBasesDropDown(
-                            options = options.value,
+                            options = mutableOptions,
                             selectedOption = selectedOption,
                             onOptionSelected = {
                                 selectedOption = it

@@ -50,8 +50,14 @@ import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.border
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import dev.gerardomarquez.simplepasswordmanager.repositories.SettingsDataStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Metodo principal que ordena todos los elementos y variables que contendra la pantalla
@@ -67,27 +73,21 @@ fun OpenFileExplorerView(
     selectedFolderString: String,
     navigateToLogin: () -> Unit
 ){
-    Log.d("OpenFileExplorer", "selectedFolderString: $selectedFolderString")
+    var mutableSelectUriStr by rememberSaveable { mutableStateOf(value = selectedFolderString) } // Se crea una variable auxiliar ya que la variable selectedFolderString no se puede modificar
+    val basePathUriPermited by rememberSaveable {
+        mutableStateOf(value = Environment.getExternalStorageDirectory().absolutePath +
+                Constants.STR_SLASH +
+                Uri.parse(mutableSelectUriStr).path?.replace(
+                    Constants.GLOBAL_STR_URI_TO_PATH,
+                    ""
+                ) // Se crea el path actual a partir de la uri que permitido el usuario explorar en la carpeta
+        )
+    }
     val context: Context = LocalContext.current
-    var currentPath by rememberSaveable { mutableStateOf(value = Environment.getExternalStorageDirectory().absolutePath) }
-    var currentColor by rememberSaveable { mutableStateOf(value = Color.White.toArgb() ) }
-    var selectedIndexFile by rememberSaveable { mutableStateOf(value = 0) }
-    val color = Color(currentColor)
-    //var selectedFolderUri by rememberSaveable { mutableStateOf(value = Uri.EMPTY) }
-    //var selectedFolderUri = Uri.EMPTY
-    //var selectedFolderUri by remember { mutableStateOf<Uri?>(value = null) }
-    /*val folderPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocumentTree()
-    ) { uri: Uri? ->
-        uri?.let {
-            it ->
-            selectedFolderUri = it
-            context.contentResolver.takePersistableUriPermission(
-                it, Intent.FLAG_GRANT_READ_URI_PERMISSION
-            )
-        }
-    }*/
-    var foldersAndFiles by rememberSaveable { mutableStateOf(value = getFolders() + getFiles(context = context, uri = Uri.parse(selectedFolderString) ) ) }
+    var currentPath by rememberSaveable { mutableStateOf(value = basePathUriPermited) }
+    var selectedIndexFile by rememberSaveable { mutableStateOf(value = Constants.GLOBAL_NEGATIVE_NUMBER) }
+    var foldersAndFiles by rememberSaveable { mutableStateOf(value = getFolders(currentPath) + getFiles(context = context, uri = Uri.parse(mutableSelectUriStr) ) ) }
+    var fileName by rememberSaveable { mutableStateOf(value = "") }
 
     Column(
         modifier = modifier
@@ -122,9 +122,10 @@ fun OpenFileExplorerView(
                     .fillMaxHeight()
                     .align(alignment = Alignment.CenterVertically)
                     .clickable {
-                        if(!currentPath.equals(Environment.getExternalStorageDirectory().absolutePath) ) {
+                        if(!currentPath.equals(basePathUriPermited) ) {
                             currentPath = currentPath.substringBeforeLast(Constants.STR_SLASH)
-                            foldersAndFiles = getFolders(path = currentPath).toMutableList() + getFiles(context = context, uri = Uri.parse(selectedFolderString) )
+                            mutableSelectUriStr = mutableSelectUriStr.substringBeforeLast(Constants.GLOBAL_STR_URI_FOLDER_LEVEL)
+                            foldersAndFiles = getFolders(path = currentPath).toMutableList() + getFiles(context = context, uri = Uri.parse(mutableSelectUriStr) )
                         }
                     }
             )
@@ -147,14 +148,16 @@ fun OpenFileExplorerView(
                                 .fillMaxWidth()
                                 .height(height = Constants.DP_SIZE_ROW_FILES.dp)
                                 .padding(vertical = Constants.DP_SIZE_ROW_FILES_PADDING.dp)
-                                .background(color)
+                                .border(
+                                    width = if (selectedIndexFile == it) Constants.DP_WIDTH_SELECT_BORDER.dp else Constants.DP_WIDTH_DESELECT_BORDER.dp,
+                                    color = if (selectedIndexFile == it) Color.Black else Color.Transparent,
+                                    shape = RoundedCornerShape(Constants.DP_ROUNDED_SELECT_BORDER.dp)
+                                )
                                 .clickable {
-                                    // Guardar el color actual antes de cambiarlo
-                                    //previousColor = currentColor
-                                    // Cambiar el color
-                                    //currentColor = if (currentColor == Color.White) Color.Blue else previousColor
-                                    currentColor = if (color == Color.White) Color.Cyan.toArgb() else Color.White.toArgb()
                                     selectedIndexFile = it
+                                    fileName = foldersAndFiles[it]!!.replace(
+                                        Constants.GLOBAL_STR_DOT + Constants.GLOBAL_STR_DATABASE_EXTENSION, ""
+                                    )
                                 },
                             folderName = foldersAndFiles[it]!!
                         )
@@ -166,30 +169,14 @@ fun OpenFileExplorerView(
                                 .padding(vertical = Constants.DP_SIZE_ROW_FILES_PADDING.dp)
                                 .clickable {
                                     currentPath += Constants.STR_SLASH + foldersAndFiles[it]
-                                    foldersAndFiles = getFolders(currentPath) + getFiles(context = context, uri = Uri.parse(selectedFolderString ) )
+                                    mutableSelectUriStr += Constants.GLOBAL_STR_URI_FOLDER_LEVEL + foldersAndFiles[it]
+                                    foldersAndFiles = getFolders(currentPath) + getFiles(context = context, uri = Uri.parse(mutableSelectUriStr ) )
+                                    selectedIndexFile = Constants.GLOBAL_NEGATIVE_NUMBER // Se reinicia el valor para que no se seleccione ningun archivo
                                 },
                             folderName = foldersAndFiles[it]!!
                         )
                     }
                 }
-                /*repeat(5){
-                    OpenSelectedFile(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(height = Constants.DP_SIZE_ROW_FILES.dp)
-                            .padding(vertical = Constants.DP_SIZE_ROW_FILES_PADDING.dp),
-                        folderName = "Archivo"
-                    )
-                }
-                repeat(5){
-                    OpenSelectedFolder(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(height = Constants.DP_SIZE_ROW_FILES.dp)
-                            .padding(vertical = Constants.DP_SIZE_ROW_FILES_PADDING.dp),
-                        folderName = "Carpeta"
-                    )
-                }*/
             }
         }
         Row(
@@ -214,7 +201,16 @@ fun OpenFileExplorerView(
                     .weight(weight = Constants.WEIGHT_LAYOUT_OPEN_FILE_EXPLORER_BUTTONS)
                     .fillMaxHeight(),
                 onClick = {
-                    //folderPickerLauncher.launch(input = null)
+                    if(selectedIndexFile != Constants.GLOBAL_NEGATIVE_NUMBER) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val completePath: String = currentPath + Constants.STR_SLASH + fileName
+                            SettingsDataStore.saveOneDatabasePath(
+                                context = context,
+                                databasePath = completePath
+                            )
+                        }
+                        navigateToLogin()
+                    }
                 }
             )
         }
