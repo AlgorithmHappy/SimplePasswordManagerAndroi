@@ -98,6 +98,10 @@ class Constants {
         val GLOBAL_STR_DOT: String = "."
         val GLOBAL_STR_URI_TO_PATH: String = "/tree/primary:"
         val GLOBAL_STR_URI_FOLDER_LEVEL: String = "%2F"
+        val GLOBAL_STR_LEFT_BRACKET: String = "["
+        val GLOBAL_STR_RIGHT_BRACKET: String = "]"
+        val GLOBAL_STR_DOUBLE_QUOTATION_MARKS: String = "\""
+        val GLOBAL_INT_ONE: Int = 1
 
         /**
          * Tamaños de textos
