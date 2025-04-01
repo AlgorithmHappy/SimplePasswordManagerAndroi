@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
 import dev.gerardomarquez.simplepasswordmanager.views.DataInsert
 import dev.gerardomarquez.simplepasswordmanager.views.DataUpdate
 import dev.gerardomarquez.simplepasswordmanager.views.Filters
@@ -19,7 +20,7 @@ import dev.gerardomarquez.simplepasswordmanager.views.OpenFileExplorerView
  * @param modifier Modificador que se aplicara a todas las pantallas que se agreguen
  */
 @Composable
-fun NavigationWrapper(modifier: Modifier){
+fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewModel){
     val navigationController = rememberNavController()
     NavHost(
         navController = navigationController,
@@ -43,6 +44,7 @@ fun NavigationWrapper(modifier: Modifier){
         composable<ScreMain> {
             Main(
                 modifier = modifier,
+                viewModel = viewModel,
                 navigateToFilters = {
                     navigationController.navigate(ScreFilters)
                 },

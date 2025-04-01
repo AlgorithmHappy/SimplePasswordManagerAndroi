@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrains.kotlin.serialization)
+    //alias(libs.plugins.kotlin.ksp)
 }
 
 android {
@@ -41,7 +42,9 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    //ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -55,6 +58,8 @@ dependencies {
     implementation(libs.androidx.navigation)
     implementation(libs.kotlin.serialization.json)
     implementation(libs.androidx.documentfile)
+    implementation(libs.androidx.room)
+    //implementation(libs.androidx.ksp)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -62,4 +67,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.core.ktx) {
+        exclude(group = "com.intellij", module = "annotations")
+    }
 }

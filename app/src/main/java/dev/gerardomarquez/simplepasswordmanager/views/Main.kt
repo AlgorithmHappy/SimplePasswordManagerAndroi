@@ -53,6 +53,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 import dev.gerardomarquez.simplepasswordmanager.R
+import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
 /**
@@ -65,6 +66,7 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 @Composable
 fun Main(
     modifier: Modifier,
+    viewModel: PasswordsInformationsViewModel,
     navigateToFilters: () -> Unit,
     navigateToInsert: () -> Unit,
     navigateToUpdate: () -> Unit,

@@ -146,6 +146,24 @@ class Constants {
         val TEXT_FILTERS_INSTRUCTIONS: String = "*Al menos un filtro deberia estar activo";
         val TEXT_MAIN: String = "Lista de contraseñas"
         val TEXT_BUTTON_OK: String = "Aceptar"
+        val TXT_TITLE: String = "*Titulo:"
+        val TXT_USER: String = "*Usuario:"
+        val TXT_PASSWORD: String = "*Contraseña:"
+        val TXT_SECRED_CODE_TOKEN: String = "Codigo secreto ó Token:"
+        val TXT_COMMENTS: String = "Comentarios:"
+        val TXT_URL: String = "Pagina WEB:"
+        val TXT_EMAIL: String = "Correo de recuperación:"
+        val TXT_PHONE_NUMBER: String = "Cel. de recuperación:"
+        val TXT_USER_DROPDOWN: String = "Usuario:"
+        val TXT_PASSWORD_DROPDOWN: String = "Contraseña:"
+        val TXT_ERROR_PASSWORD_TITLE_CONSTRAINT: String = "El titulo no puede tener más de 20 caracteres"
+        val TXT_ERROR_USERNAME_CONSTRAINT: String = "El nombre de usuario no puede tener más de 20 caracteres"
+        val TXT_ERROR_PASSWORD_CONSTRAINT: String = "El password no puede tener más de 18 caracteres"
+        val TXT_ERROR_TOKEN_CONSTRAINT: String = "El token o codigo secreto no puede tener más de 257 caracteres"
+        val TXT_ERROR_EMAIL_CONSTRAINT: String = "El correo electronico no puede tener más de 30 caracteres"
+        val TXT_ERROR_PHONE_CONSTRAINT: String = "El número de telefono debe tener máximo 12 dígitos y ser positivo"
+        val TXT_ERROR_URL_CONSTRAINT: String = "La pagina web no puede tener más de 100 caracteres"
+        val TXT_ERROR_NOTES_CONSTRAINT: String = "Los comentarios no puede tener más de 500 caracteres"
 
         /**
          * Textos de propiedades de configuracion
@@ -177,18 +195,8 @@ class Constants {
         val DP_SIZE_ROW_FILES_SPACER: Int = 15
 
         /**
-         * Texts
+         * Consultas a la base de datos
          */
-        val TXT_TITLE: String = "*Titulo:"
-        val TXT_USER: String = "*Usuario:"
-        val TXT_PASSWORD: String = "*Contraseña:"
-        val TXT_SECRED_CODE_TOKEN: String = "Codigo secreto ó Token:"
-        val TXT_COMMENTS: String = "Comentarios:"
-        val TXT_URL: String = "Pagina WEB:"
-        val TXT_EMAIL: String = "Correo de recuperación:"
-        val TXT_PHONE_NUMBER: String = "Cel. de recuperación:"
-        val TXT_USER_DROPDOWN: String = "Usuario:"
-        val TXT_PASSWORD_DROPDOWN: String = "Contraseña:"
-
+        const val QUERY_SELECT_ALL: String = "SELECT * FROM users"
     }
 }
