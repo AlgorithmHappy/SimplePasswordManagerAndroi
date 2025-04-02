@@ -19,8 +19,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val db = AppDatabase.getDatabase(this)
-        val dao = db.passwordsInformationsDao()
+        val database = AppDatabase.getInstance(applicationContext)
+        val dao = database.passwordsInformationsDao()
         val viewModel = PasswordsInformationsViewModel(dao)
 
         setContent {

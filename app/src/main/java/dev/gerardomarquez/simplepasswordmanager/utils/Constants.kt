@@ -197,6 +197,6 @@ class Constants {
         /**
          * Consultas a la base de datos
          */
-        const val QUERY_SELECT_ALL: String = "SELECT * FROM users"
+        const val QUERY_SELECT_ALL: String = "SELECT * FROM passwords_informations"
     }
 }

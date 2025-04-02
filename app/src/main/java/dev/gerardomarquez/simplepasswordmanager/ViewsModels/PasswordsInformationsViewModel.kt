@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import dev.gerardomarquez.simplepasswordmanager.ListStatePaswordInformation
 import dev.gerardomarquez.simplepasswordmanager.StatePaswordInformation
 import dev.gerardomarquez.simplepasswordmanager.dao.PasswordsInformationsDao
 import dev.gerardomarquez.simplepasswordmanager.entities.PasswordsInformations
@@ -15,20 +16,27 @@ import kotlinx.coroutines.launch
  * MVVM (Model-View-ViewModel)
  */
 class PasswordsInformationsViewModel(
-    private val paswordInformationDao: PasswordsInformationsDao
+    private val passwordInformationDao: PasswordsInformationsDao
 ) : ViewModel() {
     /**
      * Estado que contiene todos los datos de la vista Main
      */
-    var state by mutableStateOf(listOf<StatePaswordInformation>() )
+    var state by mutableStateOf(ListStatePaswordInformation())
         private set
 
-    /**
-     * Metodo que obtiene todos los datos de la tabla "passwords_informations" de la base de datos
-     */
-    fun getAllPasswordsInformations() {
+    init {
         viewModelScope.launch {
-            state = paswordInformationDao.getAllPasswordsInformations().map {
+            getAllPasswordsInformations()
+        }
+    }
+
+    /**
+     * Metodo que obtiene todos los objetos de tipo PasswordsInformations de la tabla "passwords_informations"
+     * de la base de datos
+     */
+    fun getAllPasswordsInformations(){
+        viewModelScope.launch {
+            var listPaswordInformation: List<StatePaswordInformation> = passwordInformationDao.getAllPasswordsInformations().map {
                 StatePaswordInformation(
                     id = it.id,
                     password_title = it.password_title,
@@ -41,6 +49,10 @@ class PasswordsInformationsViewModel(
                     notes = it.notes
                 )
             }
+            state = state.copy(
+                listPaswordInformation = listPaswordInformation,
+                ready = true
+            )
         }
     }
 
@@ -51,7 +63,7 @@ class PasswordsInformationsViewModel(
      */
     fun saveOnePasswordInformation(passwordInformation: PasswordsInformations){
         viewModelScope.launch {
-            paswordInformationDao.insertOnePasswordInformation(
+            passwordInformationDao.insertOnePasswordInformation(
                 passwordInformation
             )
             getAllPasswordsInformations()
@@ -64,7 +76,7 @@ class PasswordsInformationsViewModel(
      */
     fun deleteOnePasswordInformation(passwordInformation: PasswordsInformations){
         viewModelScope.launch {
-            paswordInformationDao.deletePasswordInformation(
+            passwordInformationDao.deletePasswordInformation(
                 passwordInformation
             )
             getAllPasswordsInformations()

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -52,7 +53,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
+import dev.gerardomarquez.simplepasswordmanager.ListStatePaswordInformation
 import dev.gerardomarquez.simplepasswordmanager.R
+import dev.gerardomarquez.simplepasswordmanager.StatePaswordInformation
 import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
@@ -74,16 +77,7 @@ fun Main(
     val scrollState = rememberScrollState()
     val density = LocalDensity.current // Obtener la densidad de la pantalla
     var textSearch by rememberSaveable { mutableStateOf( value = String() ) }
-    var information: DataPassword = DataPassword(
-        title = "Titulo",
-        user =  "usuario",
-        password = "password",
-        url = "URL",
-        email = "email",
-        phone = "phone",
-        comments = "comentarios",
-        secretCode = "token codigo secreto000000000000"
-    )
+    var information: ListStatePaswordInformation = viewModel.state
     var confirmationDialog by rememberSaveable { mutableStateOf(value = false)}
     var layoutCoordinates: LayoutCoordinates? = null
     var showDialogDelate by rememberSaveable { mutableStateOf(value = false)}
@@ -140,12 +134,11 @@ fun Main(
                     cordinates -> layoutCoordinates = cordinates
                 }
         ){
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .weight(Constants.WEIGHT_LAYOUT_FULL)
-                    .verticalScroll(scrollState)
             ){
-                repeat(times = 15){ // Aqui se tendra que modificar para aceptar todos los elementos
+                items(information.listPaswordInformation.size){
                     var showMenuLongPress by rememberSaveable { mutableStateOf(value = false)}
                     var menuOffset: Offset = Offset.Zero
                     Row(
@@ -155,11 +148,11 @@ fun Main(
                             .pointerInput(Unit){
                                 detectTapGestures(
                                     onLongPress = {
-                                        offset -> layoutCoordinates?.let { layout ->
-                                            val positionInWindow = layout.localToWindow(offset) // Convierte la posición relativa a absoluta
-                                            menuOffset = positionInWindow
-                                            showMenuLongPress = true // Activa el menú al hacer touch sostenido
-                                        }
+                                            offset -> layoutCoordinates?.let { layout ->
+                                        val positionInWindow = layout.localToWindow(offset) // Convierte la posición relativa a absoluta
+                                        menuOffset = positionInWindow
+                                        showMenuLongPress = true // Activa el menú al hacer touch sostenido
+                                    }
                                     }
                                 )
                             }
@@ -179,7 +172,7 @@ fun Main(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp),
-                            information = information,
+                            information = information.listPaswordInformation.get(it),
                             showDialog = showDialogDelate,
                             onClickOk = navigateToUpdate,
                             onClickDelate = {
@@ -329,7 +322,7 @@ fun ButtonSaveFile(modifier: Modifier, onClick: () -> Unit){
 @Composable
 fun InformationPasswordDropDown(
     modifier: Modifier,
-    information: DataPassword,
+    information: StatePaswordInformation,
     showDialog: Boolean,
     onClickOk: () -> Unit,
     onClickDelate: () -> Unit
@@ -355,7 +348,7 @@ fun InformationPasswordDropDown(
             val iconDown = painterResource(R.drawable.alt_arrow_down_svgrepo_com)
             // Título
             Text(
-                text = information.title,
+                text = information.password_title,
                 modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_FULL),
                 fontSize = Constants.SIZE_TEXT_TITLE_DROPDOWN.sp,
                 fontWeight = FontWeight.Bold
@@ -399,7 +392,7 @@ fun InformationPasswordDropDown(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
                     Text(
-                        text = information.user,
+                        text = information.username,
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
                         fontSize = Constants.SIZE_TEXT_VALUES_DROPDOWN.sp
                     )
@@ -465,7 +458,7 @@ fun InformationPasswordDropDown(
                     var textVisible by rememberSaveable { mutableStateOf(value = false) }
                     OutlinedTextField(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
-                        value = information.secretCode,
+                        value = information.token?:"",
                         enabled = false,
                         onValueChange = { },
                         visualTransformation = if (textVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -501,7 +494,7 @@ fun InformationPasswordDropDown(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
                     Text(
-                        text = information.comments,
+                        text = information.notes?:"",
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
                         fontSize = Constants.SIZE_TEXT_VALUES_DROPDOWN.sp
                     )
@@ -524,7 +517,7 @@ fun InformationPasswordDropDown(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
                     Text(
-                        text = information.url,
+                        text = information.url?:"",
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
                         fontSize = Constants.SIZE_TEXT_VALUES_DROPDOWN.sp
                     )
@@ -547,7 +540,7 @@ fun InformationPasswordDropDown(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
                     Text(
-                        text = information.email,
+                        text = information.email?:"",
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
                         fontSize = Constants.SIZE_TEXT_VALUES_DROPDOWN.sp
                     )
@@ -570,7 +563,7 @@ fun InformationPasswordDropDown(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_A_TENTH)
                     )
                     Text(
-                        text = information.phone,
+                        text = information.phone?.toString()?:"",
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_INFORMATION_DROPDOWN),
                         fontSize = Constants.SIZE_TEXT_VALUES_DROPDOWN.sp
                     )
@@ -732,20 +725,6 @@ fun DialogDelateMain(show: Boolean, onDismissRequest: () -> Unit){
         }
     }
 }
-
-/**
- * Clase para los dropdown que contendra toda la informacion de las cuentas guardadas
- */
-data class DataPassword(
-    var title: String, // Titulo del check
-    var user: String, // Si el check esta seleccionado o no
-    var password: String,
-    var secretCode: String, // Metodo para cambiar la variable "selected"
-    var comments: String, // Titulo del check
-    var url: String, // Titulo del check
-    var email: String, // Titulo del check
-    var phone: String, // Titulo del check
-)
 
 /*@Composable
 @Preview(
