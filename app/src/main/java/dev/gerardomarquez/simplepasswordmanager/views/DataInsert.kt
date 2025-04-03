@@ -36,6 +36,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.gerardomarquez.simplepasswordmanager.R
+import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
+import dev.gerardomarquez.simplepasswordmanager.entities.PasswordsInformations
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
 /**
@@ -47,7 +49,7 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 @Composable
 fun DataInsert(
     modifier: Modifier,
-    //navigationController: NavHostController
+    viewModel: PasswordsInformationsViewModel,
     navigateToMain: () -> Unit
 ){
     var title by rememberSaveable { mutableStateOf(value = String()) }
@@ -296,9 +298,7 @@ fun DataInsert(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 ButtonCancelInsert(
-                    onClick = navigateToMain/*{
-                        navigationController.navigate(route = Routes.ScreenMain.route)
-                    }*/
+                    onClick = navigateToMain
                 )
             }
             Spacer(modifier = Modifier.weight(0.1f))
@@ -311,7 +311,21 @@ fun DataInsert(
             ) {
                 ButtonOkInsert(
                     onClick = {
-                        confirmationDialog = true
+                        if(title.isNotBlank() && user.isNotBlank() && password.isNotBlank() ){
+                            val passwordInformation = PasswordsInformations(
+                                id = 0,
+                                password_title = title,
+                                username = user,
+                                password = password,
+                                token = if(token.isBlank() ) { null } else token,
+                                email = if(email.isBlank() ) { null } else email,
+                                phone = phone.toLongOrNull(),
+                                url = if(url.isBlank() ) { null } else url,
+                                notes = if(comments.isBlank() ) { null } else comments
+                            )
+                            viewModel.saveOnePasswordInformation(passwordInformation)
+                            confirmationDialog = true
+                        }
                     }
                 )
             }
@@ -330,6 +344,7 @@ fun DataInsert(
         show = confirmationDialog,
         onDismissRequest = {
             confirmationDialog = false
+            navigateToMain()
         }
     )
 }

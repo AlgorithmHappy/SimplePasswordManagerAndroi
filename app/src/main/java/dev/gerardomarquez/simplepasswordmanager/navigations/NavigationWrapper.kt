@@ -52,7 +52,8 @@ fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewMo
                     navigationController.navigate(ScreInsertPassword)
                 },
                 navigateToUpdate = {
-                    navigationController.navigate(ScreUpdatePassword)
+                    idPasswordInformation ->
+                    navigationController.navigate(ScreUpdatePassword(idPasswordInformation = idPasswordInformation) )
                 }
             )
         }
@@ -86,14 +87,19 @@ fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewMo
         composable<ScreInsertPassword> {
             DataInsert(
                 modifier = modifier,
+                viewModel = viewModel,
                 navigateToMain = {
                     navigationController.popBackStack()
                 }
             )
         }
         composable<ScreUpdatePassword> {
+            backStackEntry ->
+            val idPasswordInformation: ScreUpdatePassword = backStackEntry.toRoute()
             DataUpdate(
                 modifier = modifier,
+                viewModel = viewModel,
+                idPasswordInformation = idPasswordInformation.idPasswordInformation,
                 navigateToMain = {
                     navigationController.popBackStack()
                 }

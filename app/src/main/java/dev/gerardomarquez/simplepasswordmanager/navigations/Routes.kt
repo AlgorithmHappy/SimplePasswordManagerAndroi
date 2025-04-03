@@ -24,7 +24,7 @@ object ScreMain
 object ScreInsertPassword
 
 @Serializable
-object ScreUpdatePassword
+data class ScreUpdatePassword(val idPasswordInformation: Int)
 
 @Serializable
 object ScreFilters

@@ -28,6 +28,13 @@ interface PasswordsInformationsDao {
     suspend fun getAllPasswordsInformations(): List<PasswordsInformations>
 
     /**
+     * Metodo que obtiene todos los objetos de tipo PasswordsInformations de la tabla "passwords_informations"
+     * @return Lista de objetos de tipo PasswordsInformations (todos los renglones de la tabla)
+     */
+    @Query(value = Constants.QUERY_SELECT_ONE_BY_ID)
+    suspend fun getOnePasswordsInformationsById(id: Int): PasswordsInformations
+
+    /**
      * Metodo que obtiene un objeto de tipo PasswordsInformations de la tabla "passwords_informations" por su id del objeto
      * @param Objeto de tipo PasswordsInformations que se quiere obtener (solo se tomara el id de dicho objeto)
      */

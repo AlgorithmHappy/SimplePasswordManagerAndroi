@@ -37,6 +37,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.gerardomarquez.simplepasswordmanager.R
+import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
+import dev.gerardomarquez.simplepasswordmanager.entities.PasswordsInformations
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
 /**
@@ -48,17 +50,19 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 @Composable
 fun DataUpdate(
     modifier: Modifier,
-    //navigationController: NavHostController
+    viewModel: PasswordsInformationsViewModel,
+    idPasswordInformation: Int,
     navigateToMain: () -> Unit
 ){
-    var title by rememberSaveable { mutableStateOf(value = String()) }
-    var user by rememberSaveable { mutableStateOf(value = String()) }
-    var password by rememberSaveable { mutableStateOf(value = String()) }
-    var token by rememberSaveable { mutableStateOf(value = String()) }
-    var comments by rememberSaveable { mutableStateOf(value = String()) }
-    var url by rememberSaveable { mutableStateOf(value = String()) }
-    var email by rememberSaveable { mutableStateOf(value = String()) }
-    var phone by rememberSaveable { mutableStateOf(value = String()) }
+    viewModel.getOnePasswordInformationById(idPasswordInformation)
+    var title by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.password_title ) }
+    var user by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.username) }
+    var password by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.password ) }
+    var token by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.token?:"" ) }
+    var comments by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.notes?:"" ) }
+    var url by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.url?:"" ) }
+    var email by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.email?:"" ) }
+    var phone by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.phone?.toString()?:"" ) }
     var confirmationDialog by rememberSaveable { mutableStateOf(value = false) }
 
     Column(
@@ -188,7 +192,7 @@ fun DataUpdate(
                 ) {
                     UserDataInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_TITLE,
-                        dataInput = title,
+                        dataInput = viewModel.selectedPassword.password_title,
                         onDataInputChange = {title = it}
                     )
                 }
@@ -312,6 +316,20 @@ fun DataUpdate(
             ) {
                 ButtonOkUpdate(
                     onClick = {
+                        val updatePasswordInformation = PasswordsInformations(
+                            id = idPasswordInformation,
+                            password_title = title,
+                            username = user,
+                            password = password,
+                            token = token,
+                            email = email,
+                            phone = phone.toLongOrNull(),
+                            url = url,
+                            notes = comments
+                        )
+                        viewModel.saveOnePasswordInformation(
+                            updatePasswordInformation
+                        )
                         confirmationDialog = true
                     }
                 )
@@ -331,6 +349,7 @@ fun DataUpdate(
         show = confirmationDialog,
         onDismissRequest = {
             confirmationDialog = false
+            navigateToMain()
         }
     )
 }

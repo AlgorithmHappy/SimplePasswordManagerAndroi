@@ -164,6 +164,9 @@ class Constants {
         val TXT_ERROR_PHONE_CONSTRAINT: String = "El número de telefono debe tener máximo 12 dígitos y ser positivo"
         val TXT_ERROR_URL_CONSTRAINT: String = "La pagina web no puede tener más de 100 caracteres"
         val TXT_ERROR_NOTES_CONSTRAINT: String = "Los comentarios no puede tener más de 500 caracteres"
+        val TXT_COPY_USER: String = "Copiar usuario"
+        val TXT_COPY_PASSWORD: String = "Copiar contraseña"
+        val TXT_COPY_TOKEN: String = "Copiar token"
 
         /**
          * Textos de propiedades de configuracion
@@ -198,5 +201,6 @@ class Constants {
          * Consultas a la base de datos
          */
         const val QUERY_SELECT_ALL: String = "SELECT * FROM passwords_informations"
+        const val QUERY_SELECT_ONE_BY_ID: String = "SELECT * FROM passwords_informations WHERE id = :id"
     }
 }

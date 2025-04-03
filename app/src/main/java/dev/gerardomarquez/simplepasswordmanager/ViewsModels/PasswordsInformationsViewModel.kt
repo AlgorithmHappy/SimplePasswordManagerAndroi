@@ -9,6 +9,8 @@ import dev.gerardomarquez.simplepasswordmanager.ListStatePaswordInformation
 import dev.gerardomarquez.simplepasswordmanager.StatePaswordInformation
 import dev.gerardomarquez.simplepasswordmanager.dao.PasswordsInformationsDao
 import dev.gerardomarquez.simplepasswordmanager.entities.PasswordsInformations
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 /**
@@ -22,6 +24,19 @@ class PasswordsInformationsViewModel(
      * Estado que contiene todos los datos de la vista Main
      */
     var state by mutableStateOf(ListStatePaswordInformation())
+        private set
+
+    var selectedPassword by mutableStateOf(PasswordsInformations(
+        id = 0,
+        password_title = "",
+        username = "",
+        password = "",
+        token = null,
+        email = null,
+        phone = null,
+        url = null,
+        notes = null
+    ))
         private set
 
     init {
@@ -52,6 +67,23 @@ class PasswordsInformationsViewModel(
             state = state.copy(
                 listPaswordInformation = listPaswordInformation,
                 ready = true
+            )
+        }
+    }
+
+    fun getOnePasswordInformationById(id: Int) {
+        viewModelScope.launch {
+            val passwordInformation: PasswordsInformations = passwordInformationDao.getOnePasswordsInformationsById(id)
+            selectedPassword = selectedPassword.copy(
+                id = passwordInformation.id,
+                password_title = passwordInformation.password_title,
+                username = passwordInformation.username,
+                password = passwordInformation.password,
+                token = passwordInformation.token,
+                email = passwordInformation.email,
+                phone = passwordInformation.phone,
+                url = passwordInformation.url,
+                notes = passwordInformation.notes
             )
         }
     }

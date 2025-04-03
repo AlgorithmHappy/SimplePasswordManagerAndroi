@@ -57,6 +57,7 @@ import dev.gerardomarquez.simplepasswordmanager.ListStatePaswordInformation
 import dev.gerardomarquez.simplepasswordmanager.R
 import dev.gerardomarquez.simplepasswordmanager.StatePaswordInformation
 import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
+import dev.gerardomarquez.simplepasswordmanager.entities.PasswordsInformations
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
 /**
@@ -72,7 +73,7 @@ fun Main(
     viewModel: PasswordsInformationsViewModel,
     navigateToFilters: () -> Unit,
     navigateToInsert: () -> Unit,
-    navigateToUpdate: () -> Unit,
+    navigateToUpdate: (Int) -> Unit,
 ){
     val scrollState = rememberScrollState()
     val density = LocalDensity.current // Obtener la densidad de la pantalla
@@ -81,6 +82,7 @@ fun Main(
     var confirmationDialog by rememberSaveable { mutableStateOf(value = false)}
     var layoutCoordinates: LayoutCoordinates? = null
     var showDialogDelate by rememberSaveable { mutableStateOf(value = false)}
+    var deletePaswordInformation by rememberSaveable { mutableStateOf(value = 0) }
 
 
     Column(
@@ -141,6 +143,7 @@ fun Main(
                 items(information.listPaswordInformation.size){
                     var showMenuLongPress by rememberSaveable { mutableStateOf(value = false)}
                     var menuOffset: Offset = Offset.Zero
+                    var idSelectedPassword: Int = information.listPaswordInformation.get(it).id
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -174,8 +177,9 @@ fun Main(
                                 .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp),
                             information = information.listPaswordInformation.get(it),
                             showDialog = showDialogDelate,
-                            onClickOk = navigateToUpdate,
+                            onClickOk = { navigateToUpdate(idSelectedPassword) },
                             onClickDelate = {
+                                deletePaswordInformation = idSelectedPassword
                                 showDialogDelate = true
                             }
                         )
@@ -217,8 +221,25 @@ fun Main(
 
     DialogDelateMain(
         show = showDialogDelate,
+        onOkRequest = {
+            val delete = PasswordsInformations(
+                id = deletePaswordInformation,
+                password_title = "",
+                username = "",
+                password = "",
+                token = null,
+                email = null,
+                phone = null,
+                url = null,
+                notes = null
+            )
+            viewModel.deleteOnePasswordInformation(passwordInformation = delete)
+            showDialogDelate = false
+            deletePaswordInformation = 0
+        },
         onDismissRequest = {
             showDialogDelate = false
+            deletePaswordInformation = 0
         }
     )
 }
@@ -650,15 +671,15 @@ fun LongPressMenu(showMenu: Boolean, menuOffset: Offset, density: Density, onDis
         offset = DpOffset((menuOffset.x / density.density).dp, (menuOffset.y / density.density).dp)
     ) {
         DropdownMenuItem(
-            text = { Text("Copiar usuario") },
+            text = { Text(Constants.TXT_COPY_USER) },
             onClick = onClick
         )
         DropdownMenuItem(
-            text = { Text("Copiar contraseña") },
+            text = { Text(Constants.TXT_COPY_PASSWORD) },
             onClick = onClick
         )
         DropdownMenuItem(
-            text = { Text("Copiar token") },
+            text = { Text(Constants.TXT_COPY_TOKEN) },
             onClick = onClick
         )
     }
@@ -672,7 +693,7 @@ fun LongPressMenu(showMenu: Boolean, menuOffset: Offset, density: Density, onDis
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DialogDelateMain(show: Boolean, onDismissRequest: () -> Unit){
+fun DialogDelateMain(show: Boolean, onOkRequest: () -> Unit, onDismissRequest: () -> Unit){
     if(show) {
         BasicAlertDialog(
             modifier = Modifier
@@ -708,7 +729,7 @@ fun DialogDelateMain(show: Boolean, onDismissRequest: () -> Unit){
                     Button(
                         modifier = Modifier.weight(0.35f),
                         shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
-                        onClick = onDismissRequest
+                        onClick = onOkRequest
                     ){
                         Text("Si")
                     }
