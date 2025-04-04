@@ -79,6 +79,7 @@ fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewMo
         composable<ScreFilters> {
             Filters(
                 modifier = modifier,
+                viewModel = viewModel,
                 navigateToMain = {
                     navigationController.popBackStack()
                 }

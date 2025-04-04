@@ -7,7 +7,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.serialization.decodeFromString
@@ -19,6 +21,12 @@ val Context.dataStore by preferencesDataStore(name = Constants.SETTINGS_FILE_NAM
 
 object SettingsDataStore {
     private val LIST_DATABASES_KEY = stringPreferencesKey(name = Constants.SETTINGS_LIST_DATABASES)
+    private val FILTERS_KEY_TITLE = stringPreferencesKey(name = Constants.SETTINGS_FILTERS_TITLE)
+    private val FILTERS_KEY_USER = stringPreferencesKey(name = Constants.SETTINGS_FILTERS_USER)
+    private val FILTERS_KEY_NOTES = stringPreferencesKey(name = Constants.SETTINGS_FILTERS_NOTES)
+    private val FILTERS_KEY_URL = stringPreferencesKey(name = Constants.SETTINGS_FILTERS_URL)
+    private val FILTERS_KEY_EMAIL = stringPreferencesKey(name = Constants.SETTINGS_FILTERS_EMAIL)
+    private val FILTERS_KEY_NUMBER = stringPreferencesKey(name = Constants.SETTINGS_FILTERS_NUMBER)
 
     /**
      * Guarda una ruta de una base de datos, esta ruta debe ser la ultima que se creo
@@ -57,5 +65,47 @@ object SettingsDataStore {
         }
         val jsonString: String = flowDatabasesPaths.first()
         return Json.decodeFromString(jsonString)
+    }
+
+    /**
+     * Guarda los filtros configurados por el usuario para utlizar la aplicacion
+     * @param context Contexto de la aplicación
+     * @param filtersConfigurations Filtros configurados por el usuario
+     */
+    suspend fun saveFilters(
+        context: Context,
+        filtersConfigurations: AllFilters
+    ) {
+        context.dataStore.edit {
+            settings ->
+            settings[FILTERS_KEY_TITLE] = filtersConfigurations.title.toString()
+            settings[FILTERS_KEY_USER] = filtersConfigurations.user.toString()
+            settings[FILTERS_KEY_NOTES] = filtersConfigurations.notes.toString()
+            settings[FILTERS_KEY_URL] = filtersConfigurations.url.toString()
+            settings[FILTERS_KEY_EMAIL] = filtersConfigurations.email.toString()
+            settings[FILTERS_KEY_NUMBER] = filtersConfigurations.phone.toString()
+        }
+    }
+
+    /**
+     * Obtiene todos los filtros configurados por el usuario para utlizar la aplicacion
+     * @param context Contexto de la aplicación
+     * @return todos los filtros configurados por el usuario
+     */
+    suspend fun getFilters(
+        context: Context
+    ): AllFilters {
+        val flowAllFilters = context.dataStore.data.map {
+            settings ->
+            AllFilters(
+                title = settings[FILTERS_KEY_TITLE]?.toBoolean() ?: false,
+                user = settings[FILTERS_KEY_USER]?.toBoolean() ?: false,
+                notes = settings[FILTERS_KEY_NOTES]?.toBoolean() ?: false,
+                url = settings[FILTERS_KEY_URL]?.toBoolean() ?: false,
+                email = settings[FILTERS_KEY_EMAIL]?.toBoolean() ?: false,
+                phone = settings[FILTERS_KEY_NUMBER]?.toBoolean() ?: false
+            )
+        }
+        return flowAllFilters.first()
     }
 }

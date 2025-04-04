@@ -1,5 +1,6 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,72 +26,71 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
 /**
  * Metodo principal que ordena todos los elementos y variables que contendra la pantalla "Filters"
  * @param modifier Modificador que contendra el padding y el maximo de pantalla de quien lo mande
  * a llamar
- * @param navigationController Objeto que gestiona la navegacion entre pantallas de la aplicacion
+ * @param viewModel ViewModel para los datos de esta vista
+ * @param navigateToMain Metodo para regresar a la vista main
  */
 @Composable
 fun Filters(
     modifier: Modifier,
-    //navigationController: NavHostController
+    viewModel: PasswordsInformationsViewModel,
     navigateToMain: () -> Unit
 ){
-    var titleSelected by rememberSaveable { mutableStateOf(value = false) }
+    val context = LocalContext.current
     var dataTitle: CheckDataFilters = CheckDataFilters(
         title = Constants.TEXT_CHECK_TITLE,
-        selected = titleSelected,
+        selected = viewModel.stateFilters.title,
         onCheckedChange = {
-            titleSelected = it
+            viewModel.changeFilterTitle(title = it)
         }
     )
-    var userSelected by rememberSaveable { mutableStateOf(value = false) }
     var dataUser: CheckDataFilters = CheckDataFilters(
         title = Constants.TEXT_CHECK_USER,
-        selected = userSelected,
+        selected = viewModel.stateFilters.user,
         onCheckedChange = {
-            userSelected = it
+            viewModel.changeFilterUser(user = it)
         }
     )
-    var commentsSelected by rememberSaveable { mutableStateOf(value = false) }
     var dataComments: CheckDataFilters = CheckDataFilters(
         title = Constants.TEXT_CHECK_COMMENTS,
-        selected = commentsSelected,
+        selected = viewModel.stateFilters.notes,
         onCheckedChange = {
-            commentsSelected = it
+            viewModel.changeFilterNotes(notes = it)
         }
     )
-    var urlSelected by rememberSaveable { mutableStateOf(value = false) }
     var dataUrl: CheckDataFilters = CheckDataFilters(
         title = Constants.TEXT_CHECK_URL,
-        selected = urlSelected,
+        selected = viewModel.stateFilters.url,
         onCheckedChange = {
-            urlSelected = it
+            viewModel.changeFilterUrl(url = it)
         }
     )
-    var emailSelected by rememberSaveable { mutableStateOf(value = false) }
     var dataEmail: CheckDataFilters = CheckDataFilters(
         title = Constants.TEXT_CHECK_EMAIL,
-        selected = emailSelected,
+        selected = viewModel.stateFilters.email,
         onCheckedChange = {
-            emailSelected = it
+            viewModel.changeFilterEmail(email = it)
         }
     )
-    var phoneSelected by rememberSaveable { mutableStateOf(value = false) }
     var dataPhone: CheckDataFilters = CheckDataFilters(
         title = Constants.TEXT_CHECK_PHONE,
-        selected = phoneSelected,
+        selected = viewModel.stateFilters.phone,
         onCheckedChange = {
-            phoneSelected = it
+            viewModel.changeFilterNumber(number = it)
         }
     )
     var confirmationDialog by rememberSaveable { mutableStateOf(value = false)}
+    var textDialog by rememberSaveable { mutableStateOf(value = "") }
 
     Column(
         modifier = modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
@@ -130,6 +130,16 @@ fun Filters(
         )
         ButtonSaveFilters(
             onClick = {
+                if(viewModel.stateFilters.user || viewModel.stateFilters.notes ||
+                    viewModel.stateFilters.url || viewModel.stateFilters.email ||
+                    viewModel.stateFilters.phone || viewModel.stateFilters.title){
+
+                    viewModel.saveAllFilters(context = context)
+                    textDialog = Constants.TEXT_ALERT_DIALOG_FILTERS_OK
+
+                } else{
+                    textDialog = Constants.TEXT_ALERT_DIALOG_FILTERS_NO_OK
+                }
                 confirmationDialog = true
             }
         )
@@ -137,10 +147,10 @@ fun Filters(
 
     DialogFilters(
         show = confirmationDialog,
-        onClickCancel = {
+        text = textDialog,
+        onDismissRequest = {
             confirmationDialog = false
-            //navigationController.navigate(route = Routes.ScreenMain.route)
-            navigateToMain()
+            if(textDialog == Constants.TEXT_ALERT_DIALOG_FILTERS_OK) navigateToMain()
         }
     )
 }
@@ -210,13 +220,13 @@ fun ButtonSaveFilters(onClick: () -> Unit){
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DialogFilters(show: Boolean, onClickCancel: () -> Unit){
+fun DialogFilters(show: Boolean, text: String, onDismissRequest: () -> Unit){
     if(show) {
         BasicAlertDialog(
             modifier = Modifier
                 .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_WIDTH)
                 .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_HEIGHT),
-            onDismissRequest = {},
+            onDismissRequest = onDismissRequest,
         ) {
             Column(
                 modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
@@ -231,15 +241,10 @@ fun DialogFilters(show: Boolean, onClickCancel: () -> Unit){
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = Constants.TEXT_ALERT_DIALOG_FILTERS_OK,
+                    //text = Constants.TEXT_ALERT_DIALOG_FILTERS_OK,
+                    text = text,
                     textAlign = TextAlign.Center
                 )
-                OutlinedButton(
-                    shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
-                    onClick = onClickCancel
-                ) {
-                    Text(text = Constants.TEXT_BUTTON_CANCEL)
-                }
             }
         }
     }

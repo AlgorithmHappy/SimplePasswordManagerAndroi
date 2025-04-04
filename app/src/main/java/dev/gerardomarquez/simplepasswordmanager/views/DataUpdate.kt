@@ -54,15 +54,8 @@ fun DataUpdate(
     idPasswordInformation: Int,
     navigateToMain: () -> Unit
 ){
-    viewModel.getOnePasswordInformationById(idPasswordInformation)
-    var title by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.password_title ) }
-    var user by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.username) }
-    var password by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.password ) }
-    var token by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.token?:"" ) }
-    var comments by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.notes?:"" ) }
-    var url by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.url?:"" ) }
-    var email by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.email?:"" ) }
-    var phone by rememberSaveable { mutableStateOf(value = viewModel.selectedPassword.phone?.toString()?:"" ) }
+    viewModel.selectedOnePasswordInformation(idPasswordInformation)
+
     var confirmationDialog by rememberSaveable { mutableStateOf(value = false) }
 
     Column(
@@ -192,8 +185,8 @@ fun DataUpdate(
                 ) {
                     UserDataInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_TITLE,
-                        dataInput = viewModel.selectedPassword.password_title,
-                        onDataInputChange = {title = it}
+                        dataInput = viewModel.state.selectedPassword.password_title,
+                        onDataInputChange = {viewModel.changeTitle(id = idPasswordInformation, title = it)}
                     )
                 }
                 Row(
@@ -204,8 +197,8 @@ fun DataUpdate(
                 ) {
                     UserDataInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_USER,
-                        dataInput = user,
-                        onDataInputChange = {user = it}
+                        dataInput = viewModel.state.selectedPassword.username,
+                        onDataInputChange = {viewModel.changeUsername(id = idPasswordInformation, username = it)}
                     )
                 }
                 Row(
@@ -216,8 +209,8 @@ fun DataUpdate(
                 ) {
                     UserDataPrivateInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_PASSWORD,
-                        dataInput = password,
-                        onDataInputChange = {password = it}
+                        dataInput = viewModel.state.selectedPassword.password,
+                        onDataInputChange = {viewModel.changePassword(id = idPasswordInformation, password = it) }
                     )
                 }
                 Row(
@@ -228,8 +221,8 @@ fun DataUpdate(
                 ) {
                     UserDataPrivateInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_TOKEN,
-                        dataInput = token,
-                        onDataInputChange = {token = it}
+                        dataInput = viewModel.state.selectedPassword.token ?: "",
+                        onDataInputChange = {viewModel.changeToken(id = idPasswordInformation, token = it)}
                     )
                 }
                 Row(
@@ -240,8 +233,8 @@ fun DataUpdate(
                 ) {
                     UserDataInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_COMMENTS,
-                        dataInput = comments,
-                        onDataInputChange = {comments = it}
+                        dataInput = viewModel.state.selectedPassword.notes ?: "",
+                        onDataInputChange = {viewModel.changeNotes(id = idPasswordInformation,  notes = it)}
                     )
                 }
                 Row(
@@ -252,8 +245,8 @@ fun DataUpdate(
                 ) {
                     UserDataInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_URL,
-                        dataInput = url,
-                        onDataInputChange = {url = it}
+                        dataInput = viewModel.state.selectedPassword.url ?: "",
+                        onDataInputChange = {viewModel.changeWebPage(id = idPasswordInformation, url = it)}
                     )
                 }
                 Row(
@@ -264,8 +257,8 @@ fun DataUpdate(
                 ) {
                     UserDataInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_EMAIL_RECOVERY,
-                        dataInput = email,
-                        onDataInputChange = {email = it}
+                        dataInput = viewModel.state.selectedPassword.email ?: "",
+                        onDataInputChange = {viewModel.changeEmail(id = idPasswordInformation, email = it)}
                     )
                 }
                 Row(
@@ -276,8 +269,8 @@ fun DataUpdate(
                 ) {
                     UserDataPhoneInputUpdate(
                         placeHolder = Constants.DESCRIPTION_DATA_INPUT_PHONE_NUMBER,
-                        dataInput = phone,
-                        onDataInputChange = {phone = it}
+                        dataInput = viewModel.state.selectedPassword.phone?.toString() ?: "",
+                        onDataInputChange = {viewModel.changePhoneNumber(id = idPasswordInformation, phoneNumber = it)}
                     )
                 }
             }
@@ -316,17 +309,7 @@ fun DataUpdate(
             ) {
                 ButtonOkUpdate(
                     onClick = {
-                        val updatePasswordInformation = PasswordsInformations(
-                            id = idPasswordInformation,
-                            password_title = title,
-                            username = user,
-                            password = password,
-                            token = token,
-                            email = email,
-                            phone = phone.toLongOrNull(),
-                            url = url,
-                            notes = comments
-                        )
+                        val updatePasswordInformation = viewModel.state.selectedPassword.copy()
                         viewModel.saveOnePasswordInformation(
                             updatePasswordInformation
                         )

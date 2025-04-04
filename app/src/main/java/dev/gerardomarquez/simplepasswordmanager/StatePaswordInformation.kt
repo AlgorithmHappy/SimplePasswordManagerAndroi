@@ -1,5 +1,7 @@
 package dev.gerardomarquez.simplepasswordmanager
 
+import dev.gerardomarquez.simplepasswordmanager.entities.PasswordsInformations
+
 /**
  * Clase que representara el estado de la vista Main para realizar el patron arquitectonico ViewModel,
  * solo par la informacion de un elemento
@@ -21,5 +23,16 @@ data class StatePaswordInformation (
  */
 data class ListStatePaswordInformation (
     val listPaswordInformation: List<StatePaswordInformation> = listOf(),
+    val selectedPassword: PasswordsInformations = PasswordsInformations( // Si se selecciono alguno de la lista
+        id = 0,
+        password_title = "",
+        username = "",
+        password = "",
+        token = null,
+        email = null,
+        phone = null,
+        url = null,
+        notes = null
+    ),
     val ready: Boolean = false // Para indicar si la lista esta cargada por completo o no
 )

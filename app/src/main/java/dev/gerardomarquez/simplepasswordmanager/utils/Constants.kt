@@ -134,6 +134,7 @@ class Constants {
         val TEXT_ALERT_DIALOG_INSERT_OK: String = "Se ha insertado correctamente el registro, para mantener los cambios favor de presionar el boton \"Guardar archivo\""
         val TEXT_ALERT_DIALOG_UPDATE_OK: String = "Se ha actualizado correctamente el registro, para mantener los cambios favor de presionar el boton \"Guardar archivo\""
         val TEXT_ALERT_DIALOG_FILTERS_OK: String = "Se ha guardado correctamente la configuracion de filtros"
+        val TEXT_ALERT_DIALOG_FILTERS_NO_OK: String = "'NO' Se ha guardado la configuracion de filtros debido a que no se selecciono ningun filtro"
         val TEXT_ALERT_DIALOG_MAIN_SAVE: String = "Se ha guardado correctamente los registros en el archivo"
         val TEXT_ALERT_DIALOG_MAIN_DELATE: String = "¿Seguro que quieres eliminar el archivo?"
         val TEXT_ALERT_DIALOG_NEW_FILE: String = "Ingrese el nombre del archivo"
@@ -173,6 +174,12 @@ class Constants {
          */
         val SETTINGS_FILE_NAME: String = "settings_prefs"
         val SETTINGS_LIST_DATABASES: String = "database_list"
+        val SETTINGS_FILTERS_TITLE: String = "filters_title"
+        val SETTINGS_FILTERS_USER: String = "filters_user"
+        val SETTINGS_FILTERS_NOTES: String = "filters_notes"
+        val SETTINGS_FILTERS_URL: String = "filters_url"
+        val SETTINGS_FILTERS_EMAIL: String = "filters_email"
+        val SETTINGS_FILTERS_NUMBER: String = "filters_number"
 
         /**
          * Tamaños de dp's
