@@ -75,7 +75,6 @@ fun Main(
     navigateToInsert: () -> Unit,
     navigateToUpdate: (Int) -> Unit,
 ){
-    val scrollState = rememberScrollState()
     val density = LocalDensity.current // Obtener la densidad de la pantalla
     var textSearch by rememberSaveable { mutableStateOf( value = String() ) }
     var information: ListStatePaswordInformation = viewModel.state
@@ -116,6 +115,7 @@ fun Main(
                 dataInput = textSearch,
                 onDataInputChange = {
                     textSearch = it
+                    viewModel.filterList(searchText = textSearch)
                 }
             )
             Spacer(
@@ -176,7 +176,6 @@ fun Main(
                                 .fillMaxSize()
                                 .padding(vertical = Constants.DP_PADDING_PASSWORDS_DROPDOWNS_MENUS.dp),
                             information = information.listPaswordInformation.get(it),
-                            showDialog = showDialogDelate,
                             onClickOk = { navigateToUpdate(idSelectedPassword) },
                             onClickDelate = {
                                 deletePaswordInformation = idSelectedPassword
@@ -344,7 +343,6 @@ fun ButtonSaveFile(modifier: Modifier, onClick: () -> Unit){
 fun InformationPasswordDropDown(
     modifier: Modifier,
     information: StatePaswordInformation,
-    showDialog: Boolean,
     onClickOk: () -> Unit,
     onClickDelate: () -> Unit
 ) {

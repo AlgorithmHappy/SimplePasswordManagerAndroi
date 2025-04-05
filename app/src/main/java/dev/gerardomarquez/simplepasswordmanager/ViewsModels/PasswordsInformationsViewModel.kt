@@ -1,6 +1,7 @@
 package dev.gerardomarquez.simplepasswordmanager.ViewsModels
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
@@ -417,12 +418,61 @@ class PasswordsInformationsViewModel(
 
     /**
      * Guarda todos los filtros configurados en el stateFilters
+     * @param context Contexto de la aplicacion
      */
     fun saveAllFilters(context: Context){
         viewModelScope.launch {
             SettingsDataStore.saveFilters(
                 context = context,
                 filtersConfigurations = stateFilters.copy()
+            )
+        }
+    }
+
+    /**
+     * Metodo que filtra la lista de passwords por el texto que se le pase. Y aplica los filtros
+     * configurados por el usario en la vista de "Filters"
+     * @param searchText Texto que se le pasara para filtrar la lista
+     */
+    fun filterList(searchText: String){
+        viewModelScope.launch {
+            val list = state.listPaswordInformation
+            //PasswordsInformations
+            lateinit var filteredList: List<StatePaswordInformation>
+            var listPaswordInformation: List<PasswordsInformations> = passwordInformationDao.getAllPasswordsInformations()
+            filteredList = listPaswordInformation.map {
+                StatePaswordInformation(
+                    id = it.id,
+                    password_title = it.password_title,
+                    username = it.username,
+                    password = it.password,
+                    token = it.token,
+                    email = it.email,
+                    phone = it.phone,
+                    url = it.url,
+                    notes = it.notes
+                )
+            }.filter {
+                if(searchText.isBlank() ){
+                    true
+                } else if(stateFilters.title) {
+                    it.password_title.contains(searchText, ignoreCase = true)
+                } else if(stateFilters.user) {
+                    it.username.contains(searchText, ignoreCase = true)
+                } else if(stateFilters.notes) {
+                    it.notes?.contains(searchText, ignoreCase = true) ?: false
+                } else if(stateFilters.url) {
+                    it.url?.contains(searchText, ignoreCase = true) ?: false
+                } else if(stateFilters.email) {
+                    it.email?.contains(searchText, ignoreCase = true) ?: false
+                } else if(stateFilters.phone) {
+                    it.phone.toString().contains(searchText, ignoreCase = true)
+                } else {
+                    false
+                }
+            }
+            state = state.copy(
+                listPaswordInformation = filteredList
             )
         }
     }
