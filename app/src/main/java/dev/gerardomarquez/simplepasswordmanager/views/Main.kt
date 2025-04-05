@@ -1,5 +1,6 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -13,9 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -29,6 +28,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,8 +44,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -59,6 +63,7 @@ import dev.gerardomarquez.simplepasswordmanager.StatePaswordInformation
 import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
 import dev.gerardomarquez.simplepasswordmanager.entities.PasswordsInformations
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
+import kotlinx.coroutines.delay
 
 /**
  * Metodo principal que ordena todos los elementos y variables que contendra la pantalla MAIN, que
@@ -76,13 +81,15 @@ fun Main(
     navigateToUpdate: (Int) -> Unit,
 ){
     val density = LocalDensity.current // Obtener la densidad de la pantalla
+    val context = LocalContext.current
     var textSearch by rememberSaveable { mutableStateOf( value = String() ) }
     var information: ListStatePaswordInformation = viewModel.state
     var confirmationDialog by rememberSaveable { mutableStateOf(value = false)}
     var layoutCoordinates: LayoutCoordinates? = null
     var showDialogDelate by rememberSaveable { mutableStateOf(value = false)}
     var deletePaswordInformation by rememberSaveable { mutableStateOf(value = 0) }
-
+    val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    var clipboardCopy by rememberSaveable { mutableStateOf(value = false) }
 
     Column(
         modifier = modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
@@ -167,7 +174,22 @@ fun Main(
                             onDismissRequest = {
                                 showMenuLongPress = false
                             },
-                            onClick = {
+                            onClickCopyUser = {
+                                clipboardManager.setText(annotatedString = AnnotatedString(information.listPaswordInformation.get(it).username ) )
+                                clipboardCopy = true
+                                Toast.makeText(context, "Usuario copiado, se borrara en 30 segundos", Toast.LENGTH_SHORT).show()
+                                showMenuLongPress = false
+                            },
+                            onClickCopyPassword = {
+                                clipboardManager.setText(annotatedString = AnnotatedString(information.listPaswordInformation.get(it).password ) )
+                                clipboardCopy = true
+                                Toast.makeText(context, "Contraseña copiada, se borrara en 30 segundos", Toast.LENGTH_SHORT).show()
+                                showMenuLongPress = false
+                            },
+                            onClickCopyToken = {
+                                clipboardManager.setText(annotatedString = AnnotatedString(information.listPaswordInformation.get(it).token?:"Sin token" ) )
+                                clipboardCopy = true
+                                Toast.makeText(context, "Token copiado, se borrara en 30 segundos", Toast.LENGTH_SHORT).show()
                                 showMenuLongPress = false
                             }
                         )
@@ -241,6 +263,14 @@ fun Main(
             deletePaswordInformation = 0
         }
     )
+
+    if (clipboardCopy) {
+        LaunchedEffect(Unit) {
+            delay(30_000L)
+            clipboardManager.setText(AnnotatedString(""))
+            clipboardCopy = false
+        }
+    }
 }
 
 /**
@@ -662,7 +692,15 @@ fun DialogMain(show: Boolean, onDismissRequest: () -> Unit){
  * Sub menu copiar usuario, contraseña o token
  */
 @Composable
-fun LongPressMenu(showMenu: Boolean, menuOffset: Offset, density: Density, onDismissRequest: () -> Unit, onClick: () -> Unit) {
+fun LongPressMenu(
+    showMenu: Boolean,
+    menuOffset: Offset,
+    density: Density,
+    onDismissRequest: () -> Unit,
+    onClickCopyUser: () -> Unit,
+    onClickCopyPassword: () -> Unit,
+    onClickCopyToken: () -> Unit
+) {
     DropdownMenu(
         expanded = showMenu,
         onDismissRequest = onDismissRequest,
@@ -670,15 +708,15 @@ fun LongPressMenu(showMenu: Boolean, menuOffset: Offset, density: Density, onDis
     ) {
         DropdownMenuItem(
             text = { Text(Constants.TXT_COPY_USER) },
-            onClick = onClick
+            onClick = onClickCopyUser
         )
         DropdownMenuItem(
             text = { Text(Constants.TXT_COPY_PASSWORD) },
-            onClick = onClick
+            onClick = onClickCopyPassword
         )
         DropdownMenuItem(
             text = { Text(Constants.TXT_COPY_TOKEN) },
-            onClick = onClick
+            onClick = onClickCopyToken
         )
     }
 }
