@@ -9,15 +9,19 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import dev.gerardomarquez.simplepasswordmanager.R
 import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
 import dev.gerardomarquez.simplepasswordmanager.entities.PasswordsInformations
+import dev.gerardomarquez.simplepasswordmanager.utils.CharactersIncludedInPassword
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 
 /**
@@ -61,13 +66,16 @@ fun DataInsert(
     var email by rememberSaveable { mutableStateOf(value = String()) }
     var phone by rememberSaveable { mutableStateOf(value = String()) }
     var confirmationDialog by rememberSaveable { mutableStateOf(value = false) }
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
             .fillMaxSize()
-            .padding(horizontal = Constants.DP_PADDING.dp, vertical = Constants.DP_PADDING.dp),
+            .padding(horizontal = Constants.DP_PADDING.dp, vertical = Constants.DP_PADDING.dp)
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+
     ) {
         Row(
             modifier = Modifier
@@ -277,6 +285,7 @@ fun DataInsert(
                         onDataInputChange = {phone = it}
                     )
                 }
+
             }
         }
         Row(
@@ -293,7 +302,7 @@ fun DataInsert(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .weight(0.45f),
+                    .weight(0.3f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -301,11 +310,27 @@ fun DataInsert(
                     onClick = navigateToMain
                 )
             }
-            Spacer(modifier = Modifier.weight(0.1f))
+            Spacer(modifier = Modifier.weight(0.01f))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.38f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                OutlinedButton(
+                    modifier = Modifier.fillMaxSize(),
+                    shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
+                    onClick = { }
+                ) {
+                    Text(text = Constants.TEXT_PASSWORD_GENERATOR)
+                }
+            }
+            Spacer(modifier = Modifier.weight(0.01f))
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .weight(0.45f),
+                    .weight(0.3f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -474,7 +499,7 @@ fun SaveAlertDialogInsert(show: Boolean, onDismissRequest: () -> Unit){
         ) {
             Column(
                 modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
-                    .clip(RoundedCornerShape(Constants.DP_ROUNDED_DIALOGS.dp) )
+                    .clip(RoundedCornerShape(Constants.DP_ROUNDED_DIALOGS.dp))
                     .fillMaxSize()
                     .background(color = Color.White)
                     .padding(
@@ -489,6 +514,88 @@ fun SaveAlertDialogInsert(show: Boolean, onDismissRequest: () -> Unit){
                     textAlign = TextAlign.Center
                 )
 
+            }
+        }
+    }
+}
+
+/**
+ * Crea un dialogo por encima de toda la vista para indicar al usuario que se inserto el registro
+ * correctamente
+ * @param show Si es true se mostrara el dialogo en caso contrario se ocultara
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DialogPassgordGenerator(show: Boolean, onDismissRequest: () -> Unit){
+    var password by rememberSaveable { mutableStateOf(value = String()) }
+    var lowerCase by rememberSaveable { mutableStateOf(value = true) }
+    var upperCase by rememberSaveable { mutableStateOf(value = false) }
+    var numbers by rememberSaveable { mutableStateOf(value = false) }
+    var specialCharacters by rememberSaveable { mutableStateOf(value = false) }
+    val validateCheckBox: (Boolean, Boolean, Boolean, Boolean,) -> Boolean = {
+        lowerCase, upperCase, numbers, specialCharacters ->
+        !(!lowerCase && !upperCase && !numbers && !specialCharacters) // Debe haber al menos un tipo de caracter elegido
+    }
+    if(show) {
+        BasicAlertDialog(
+            modifier = Modifier
+                .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_WIDTH)
+                .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_HEIGHT),
+            onDismissRequest = onDismissRequest,
+        ) {
+            Column(
+                modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
+                    .clip(RoundedCornerShape(Constants.DP_ROUNDED_DIALOGS.dp))
+                    .fillMaxSize()
+                    .background(color = Color.White)
+                    .padding(
+                        horizontal = Constants.DP_PADDING_DIALOGS.dp,
+                        vertical = Constants.DP_PADDING_DIALOGS.dp
+                    ),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = Constants.TEXT_ALERT_DIALOG_PASSWORD_GENERATOR,
+                    textAlign = TextAlign.Center
+                )
+                UserDataPrivateInputInsert(
+                    placeHolder = "",
+                    dataInput = password,
+                    onDataInputChange = { password = it }
+                )
+                Checkbox(
+                    checked = lowerCase,
+                    onCheckedChange = {
+                        if(validateCheckBox(it, upperCase, numbers, specialCharacters) ){
+                            lowerCase = it
+                        }
+                    }
+                )
+                Checkbox(
+                    checked = upperCase,
+                    onCheckedChange = {
+                        if(validateCheckBox(lowerCase, it, numbers, specialCharacters) ){
+                            upperCase = it
+                        }
+                    }
+                )
+                Checkbox(
+                    checked = numbers,
+                    onCheckedChange = {
+                        if(validateCheckBox(lowerCase, upperCase, it, specialCharacters) ){
+                            numbers = it
+                        }
+                    }
+                )
+                Checkbox(
+                    checked = specialCharacters,
+                    onCheckedChange = {
+                        if(validateCheckBox(lowerCase, upperCase, numbers, it) ){
+                            specialCharacters = it
+                        }
+                    }
+                )
             }
         }
     }

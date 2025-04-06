@@ -125,6 +125,7 @@ class Constants {
         val TEXT_BUTTON_UPDATE: String = "Actualizar";
         val TEXT_BUTTON_DELETE: String = "Eliminar";
         val TEXT_BUTTON_CANCEL: String = "Cancelar";
+        val TEXT_PASSWORD_GENERATOR: String = "Crear clave";
         val TEXT_BUTTON_SAVE_FILE: String = "Guardar archivo";
         val TEXT_BUTTON_NEW_INSERT: String = "Insertar nuevo";
         val TEXT_BUTTON_SAVE_FILTERS: String = "Guardar filtros";
@@ -132,6 +133,7 @@ class Constants {
         val TEXT_BUTTON_SELECT_FILE: String = "Seleccionar archivo"
         val TEXT_INSERT_VIEW_INSTRUCTIONS: String = "Los campos marcados con \"*\" son obligatorios y el campo titulo debe ser unico"
         val TEXT_ALERT_DIALOG_INSERT_OK: String = "Se ha insertado correctamente el registro, para mantener los cambios favor de presionar el boton \"Guardar archivo\""
+        val TEXT_ALERT_DIALOG_PASSWORD_GENERATOR: String = "Generar contraseña aleatoria"
         val TEXT_ALERT_DIALOG_UPDATE_OK: String = "Se ha actualizado correctamente el registro, para mantener los cambios favor de presionar el boton \"Guardar archivo\""
         val TEXT_ALERT_DIALOG_FILTERS_OK: String = "Se ha guardado correctamente la configuracion de filtros"
         val TEXT_ALERT_DIALOG_FILTERS_NO_OK: String = "'NO' Se ha guardado la configuracion de filtros debido a que no se selecciono ningun filtro"
@@ -168,6 +170,12 @@ class Constants {
         val TXT_COPY_USER: String = "Copiar usuario"
         val TXT_COPY_PASSWORD: String = "Copiar contraseña"
         val TXT_COPY_TOKEN: String = "Copiar token"
+        val TXT_ERROR_CHRACTER_TYPE: String = "At least one character type must be selected."
+        val TXT_LOWER_CASE: String = "abcdefghijklmnopqrstuvwxyz"
+        val TXT_UPPER_CASE: String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        val TXT_NUMBERS: String = "0123456789"
+        val TXT_SPECIAL_CHARACTERS: String = "!@#$%&*()-_=+[]{};:,.<>?/"
+
 
         /**
          * Textos de propiedades de configuracion
