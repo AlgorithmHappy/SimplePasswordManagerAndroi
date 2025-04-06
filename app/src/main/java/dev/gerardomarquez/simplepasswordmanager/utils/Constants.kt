@@ -39,6 +39,8 @@ class Constants {
         val WEIGHT_LAYOUT_ONE_EIGHTH: Float = 0.125f
         val WEIGHT_LAYOUT_DIALOGS_HEIGHT: Float = 0.25f
         val WEIGHT_LAYOUT_DIALOGS_WIDTH: Float = 0.95f
+        val WEIGHT_LAYOUT_PASSWORD_DIALOG_HEIGHT: Float = 0.70f
+        val WEIGHT_LAYOUT_PASSWORD_DIALOG_WIDTH: Float = 0.95f
         val WEIGHT_LAYOUT_MAIN_FILTER: Float = 0.03f
         val WEIGHT_LAYOUT_SEARCH_BAR_MAIN: Float = 0.84f
         val WEIGHT_LAYOUT_ICON_FILTER: Float = 0.13f
@@ -75,6 +77,7 @@ class Constants {
         val DESCRIPTION_FOLDER_SELECTED: String = "Seleccionar folder"
         val DESCRIPTION_FILE_SELECTED: String = "Seleccionar archivo"
         val DESCRIPTION_ICON_NEW: String = "Abrir explorador de archivos"
+        val DESCRIPTION_ICON_REFRESH: String = "Generar contraseña"
         val DESCRIPTION_ICON_BACK_FOLDER: String = "Regresar a la carpeta anterior"
         val DESCRIPTION_DATA_INPUT_TITLE: String = "Ej. Cuenta de Facebook"
         val DESCRIPTION_DATA_INPUT_USER: String = "Ej. JuanP096"
@@ -134,6 +137,7 @@ class Constants {
         val TEXT_INSERT_VIEW_INSTRUCTIONS: String = "Los campos marcados con \"*\" son obligatorios y el campo titulo debe ser unico"
         val TEXT_ALERT_DIALOG_INSERT_OK: String = "Se ha insertado correctamente el registro, para mantener los cambios favor de presionar el boton \"Guardar archivo\""
         val TEXT_ALERT_DIALOG_PASSWORD_GENERATOR: String = "Generar contraseña aleatoria"
+        val TEXT_ALERT_DIALOG_PASSWORD_GENERATOR_SIZE: String = "Seleccione el tamaño de la contraseña:"
         val TEXT_ALERT_DIALOG_UPDATE_OK: String = "Se ha actualizado correctamente el registro, para mantener los cambios favor de presionar el boton \"Guardar archivo\""
         val TEXT_ALERT_DIALOG_FILTERS_OK: String = "Se ha guardado correctamente la configuracion de filtros"
         val TEXT_ALERT_DIALOG_FILTERS_NO_OK: String = "'NO' Se ha guardado la configuracion de filtros debido a que no se selecciono ningun filtro"
@@ -175,6 +179,12 @@ class Constants {
         val TXT_UPPER_CASE: String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         val TXT_NUMBERS: String = "0123456789"
         val TXT_SPECIAL_CHARACTERS: String = "!@#$%&*()-_=+[]{};:,.<>?/"
+        val TXT_LOWER_CASE_CHEK: String = "Incluir minusculas"
+        val TXT_UPPER_CASE_CHEK: String = "Incluir mayusculas"
+        val TXT_NUMBERS_CHEK: String = "Incluir numeros"
+        val TXT_SPECIAL_CHARACTERS_CHEK: String = "Incluir caracteres especiales"
+        val TXT_USE_PASSWORD_GENERATED: String = "Usar"
+        val TXT_COPY_PASSWORD_GENERATED: String = "Copiar"
 
 
         /**

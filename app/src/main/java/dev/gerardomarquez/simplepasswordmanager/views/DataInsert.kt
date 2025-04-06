@@ -1,14 +1,19 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -20,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -44,6 +50,7 @@ import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformation
 import dev.gerardomarquez.simplepasswordmanager.entities.PasswordsInformations
 import dev.gerardomarquez.simplepasswordmanager.utils.CharactersIncludedInPassword
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
+import dev.gerardomarquez.simplepasswordmanager.utils.passwordGenerator
 
 /**
  * Metodo principal donde se encuentra toda la estructura y los datos que se utilizan para la vista
@@ -67,6 +74,7 @@ fun DataInsert(
     var phone by rememberSaveable { mutableStateOf(value = String()) }
     var confirmationDialog by rememberSaveable { mutableStateOf(value = false) }
     val scrollState = rememberScrollState()
+    var makePasswordDialog by rememberSaveable { mutableStateOf(value = false) }
 
     Column(
         modifier = modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
@@ -321,7 +329,7 @@ fun DataInsert(
                 OutlinedButton(
                     modifier = Modifier.fillMaxSize(),
                     shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
-                    onClick = { }
+                    onClick = { makePasswordDialog = true}
                 ) {
                     Text(text = Constants.TEXT_PASSWORD_GENERATOR)
                 }
@@ -370,6 +378,12 @@ fun DataInsert(
         onDismissRequest = {
             confirmationDialog = false
             navigateToMain()
+        }
+    )
+    DialogPassgordGenerator(
+        show = makePasswordDialog ,
+        onDismissRequest = {
+            makePasswordDialog = false
         }
     )
 }
@@ -536,11 +550,13 @@ fun DialogPassgordGenerator(show: Boolean, onDismissRequest: () -> Unit){
         lowerCase, upperCase, numbers, specialCharacters ->
         !(!lowerCase && !upperCase && !numbers && !specialCharacters) // Debe haber al menos un tipo de caracter elegido
     }
+    var sizeSelected by rememberSaveable { mutableStateOf(value = 8) }
+
     if(show) {
         BasicAlertDialog(
             modifier = Modifier
-                .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_WIDTH)
-                .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_HEIGHT),
+                .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_PASSWORD_DIALOG_WIDTH)
+                .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_PASSWORD_DIALOG_HEIGHT),
             onDismissRequest = onDismissRequest,
         ) {
             Column(
@@ -559,43 +575,159 @@ fun DialogPassgordGenerator(show: Boolean, onDismissRequest: () -> Unit){
                     text = Constants.TEXT_ALERT_DIALOG_PASSWORD_GENERATOR,
                     textAlign = TextAlign.Center
                 )
-                UserDataPrivateInputInsert(
-                    placeHolder = "",
-                    dataInput = password,
-                    onDataInputChange = { password = it }
-                )
-                Checkbox(
-                    checked = lowerCase,
-                    onCheckedChange = {
-                        if(validateCheckBox(it, upperCase, numbers, specialCharacters) ){
-                            lowerCase = it
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(0.8f)
+                    ) {
+                        UserDataPrivateInputInsert(
+                            placeHolder = "",
+                            dataInput = password,
+                            onDataInputChange = { password = it }
+                        )
+                    }
+                    Column(modifier = Modifier.fillMaxWidth(0.2f) ) {
+                        IconButton(
+                            modifier = Modifier.height(50.dp).width(50.dp),
+                            onClick = {
+                                password = passwordGenerator(
+                                    size = sizeSelected,
+                                    charactersIncluded = CharactersIncludedInPassword(
+                                        lowerCase = lowerCase,
+                                        upperCase = upperCase,
+                                        numbers = numbers,
+                                        specialCharacters = specialCharacters
+                                    )
+                                )
+                            },
+                        ) {
+                            Icon(
+                                modifier = Modifier.fillMaxWidth().fillMaxHeight().clickable {
+                                    password = passwordGenerator(
+                                        size = sizeSelected,
+                                        charactersIncluded = CharactersIncludedInPassword(
+                                            lowerCase = lowerCase,
+                                            upperCase = upperCase,
+                                            numbers = numbers,
+                                            specialCharacters = specialCharacters
+                                        )
+                                    )
+                                },
+                                painter = painterResource(id = R.drawable.refresh_square_svgrepo_com),
+                                contentDescription = Constants.DESCRIPTION_ICON_REFRESH
+                            )
                         }
                     }
+                }
+                Text(
+                    text = Constants.TEXT_ALERT_DIALOG_PASSWORD_GENERATOR_SIZE,
+                    textAlign = TextAlign.Center
                 )
-                Checkbox(
-                    checked = upperCase,
-                    onCheckedChange = {
-                        if(validateCheckBox(lowerCase, it, numbers, specialCharacters) ){
-                            upperCase = it
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ){
+                    RadioButton(
+                        selected = sizeSelected == 8,
+                        onClick = { sizeSelected = 8 }
+                    )
+                    Text(text = "8")
+                    RadioButton(
+                        selected = sizeSelected == 10,
+                        onClick = { sizeSelected = 10 }
+                    )
+                    Text(text = "10")
+                    RadioButton(
+                        selected = sizeSelected == 12,
+                        onClick = { sizeSelected = 12 }
+                    )
+                    Text(text = "12")
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = Constants.TXT_LOWER_CASE_CHEK)
+                    Checkbox(
+                        checked = lowerCase,
+                        onCheckedChange = {
+                            if(validateCheckBox(it, upperCase, numbers, specialCharacters) ){
+                                lowerCase = it
+                            }
                         }
-                    }
-                )
-                Checkbox(
-                    checked = numbers,
-                    onCheckedChange = {
-                        if(validateCheckBox(lowerCase, upperCase, it, specialCharacters) ){
-                            numbers = it
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = Constants.TXT_UPPER_CASE_CHEK)
+                    Checkbox(
+                        checked = upperCase,
+                        onCheckedChange = {
+                            if (validateCheckBox(lowerCase, it, numbers, specialCharacters)) {
+                                upperCase = it
+                            }
                         }
-                    }
-                )
-                Checkbox(
-                    checked = specialCharacters,
-                    onCheckedChange = {
-                        if(validateCheckBox(lowerCase, upperCase, numbers, it) ){
-                            specialCharacters = it
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = Constants.TXT_NUMBERS_CHEK)
+                    Checkbox(
+                        checked = numbers,
+                        onCheckedChange = {
+                            if (validateCheckBox(lowerCase, upperCase, it, specialCharacters)) {
+                                numbers = it
+                            }
                         }
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = Constants.TXT_SPECIAL_CHARACTERS_CHEK)
+                    Checkbox(
+                        checked = specialCharacters,
+                        onCheckedChange = {
+                            if (validateCheckBox(lowerCase, upperCase, numbers, it)) {
+                                specialCharacters = it
+                            }
+                        }
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    OutlinedButton(
+                        onClick = {
+
+                        }
+                    ) {
+                        Text(text = Constants.TXT_USE_PASSWORD_GENERATED)
                     }
-                )
+                    OutlinedButton(
+                        onClick = {
+
+                        }
+                    ) {
+                        Text(text = Constants.TXT_COPY_PASSWORD_GENERATED)
+                    }
+                }
             }
         }
     }
