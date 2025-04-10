@@ -1,5 +1,6 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,11 +40,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.gerardomarquez.simplepasswordmanager.R
@@ -51,6 +58,7 @@ import dev.gerardomarquez.simplepasswordmanager.entities.PasswordsInformations
 import dev.gerardomarquez.simplepasswordmanager.utils.CharactersIncludedInPassword
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 import dev.gerardomarquez.simplepasswordmanager.utils.passwordGenerator
+import kotlinx.coroutines.delay
 
 /**
  * Metodo principal donde se encuentra toda la estructura y los datos que se utilizan para la vista
@@ -380,8 +388,12 @@ fun DataInsert(
             navigateToMain()
         }
     )
-    DialogPassgordGenerator(
-        show = makePasswordDialog ,
+    DialogPasswordGenerator(
+        show = makePasswordDialog,
+        useButtonOnRequest = {
+            it ->
+            password = it
+        },
         onDismissRequest = {
             makePasswordDialog = false
         }
@@ -540,8 +552,7 @@ fun SaveAlertDialogInsert(show: Boolean, onDismissRequest: () -> Unit){
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DialogPassgordGenerator(show: Boolean, onDismissRequest: () -> Unit){
-    var password by rememberSaveable { mutableStateOf(value = String()) }
+fun DialogPasswordGenerator(show: Boolean, useButtonOnRequest: (String) -> Unit, onDismissRequest: () -> Unit) {
     var lowerCase by rememberSaveable { mutableStateOf(value = true) }
     var upperCase by rememberSaveable { mutableStateOf(value = false) }
     var numbers by rememberSaveable { mutableStateOf(value = false) }
@@ -551,6 +562,22 @@ fun DialogPassgordGenerator(show: Boolean, onDismissRequest: () -> Unit){
         !(!lowerCase && !upperCase && !numbers && !specialCharacters) // Debe haber al menos un tipo de caracter elegido
     }
     var sizeSelected by rememberSaveable { mutableStateOf(value = 8) }
+    var password by rememberSaveable {
+        mutableStateOf(
+            value = passwordGenerator(
+                size = sizeSelected,
+                charactersIncluded = CharactersIncludedInPassword(
+                    lowerCase = lowerCase,
+                    upperCase = upperCase,
+                    numbers = numbers,
+                    specialCharacters = specialCharacters
+                )
+            )
+        )
+    }
+    val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    var clipboardCopy by rememberSaveable { mutableStateOf(value = false) }
+    val context = LocalContext.current
 
     if(show) {
         BasicAlertDialog(
@@ -578,10 +605,10 @@ fun DialogPassgordGenerator(show: Boolean, onDismissRequest: () -> Unit){
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.Center
                 ) {
                     Column(
-                        modifier = Modifier.fillMaxWidth(0.8f)
+                        modifier = Modifier.weight(0.8f)
                     ) {
                         UserDataPrivateInputInsert(
                             placeHolder = "",
@@ -589,9 +616,8 @@ fun DialogPassgordGenerator(show: Boolean, onDismissRequest: () -> Unit){
                             onDataInputChange = { password = it }
                         )
                     }
-                    Column(modifier = Modifier.fillMaxWidth(0.2f) ) {
+                    Column(modifier = Modifier.weight(0.2f) ) {
                         IconButton(
-                            modifier = Modifier.height(50.dp).width(50.dp),
                             onClick = {
                                 password = passwordGenerator(
                                     size = sizeSelected,
@@ -605,17 +631,6 @@ fun DialogPassgordGenerator(show: Boolean, onDismissRequest: () -> Unit){
                             },
                         ) {
                             Icon(
-                                modifier = Modifier.fillMaxWidth().fillMaxHeight().clickable {
-                                    password = passwordGenerator(
-                                        size = sizeSelected,
-                                        charactersIncluded = CharactersIncludedInPassword(
-                                            lowerCase = lowerCase,
-                                            upperCase = upperCase,
-                                            numbers = numbers,
-                                            specialCharacters = specialCharacters
-                                        )
-                                    )
-                                },
                                 painter = painterResource(id = R.drawable.refresh_square_svgrepo_com),
                                 contentDescription = Constants.DESCRIPTION_ICON_REFRESH
                             )
@@ -715,20 +730,31 @@ fun DialogPassgordGenerator(show: Boolean, onDismissRequest: () -> Unit){
                 ) {
                     OutlinedButton(
                         onClick = {
-
+                            useButtonOnRequest(password)
+                            onDismissRequest()
                         }
                     ) {
                         Text(text = Constants.TXT_USE_PASSWORD_GENERATED)
                     }
                     OutlinedButton(
                         onClick = {
-
+                            clipboardManager.setText(annotatedString = AnnotatedString(text = password) )
+                            clipboardCopy = true
+                            Toast.makeText(context, "Password copiado, se borrara en 30 segundos", Toast.LENGTH_SHORT).show()
+                            onDismissRequest()
                         }
                     ) {
                         Text(text = Constants.TXT_COPY_PASSWORD_GENERATED)
                     }
                 }
             }
+        }
+    }
+    if (clipboardCopy) {
+        LaunchedEffect(Unit) {
+            delay(30_000L)
+            clipboardManager.setText(AnnotatedString(""))
+            clipboardCopy = false
         }
     }
 }
