@@ -58,7 +58,8 @@ fun Login(
     modifier: Modifier,
     navigateToMain: () -> Unit,
     navigateToFolderFileExplorer: (String) -> Unit,
-    navigateToNewFileExplorer: () -> Unit
+    navigateToNewFileExplorer: () -> Unit,
+    navigateToSettings: () -> Unit
 ) {
     val context: Context = LocalContext.current
     var password by rememberSaveable { mutableStateOf(value = String()) }
@@ -168,11 +169,20 @@ fun Login(
                 Row(
                     modifier = Modifier.fillMaxWidth().weight(Constants.WEIGHT_LAYOUT_NEW_BUTTON),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    IconButton(
+                        onClick = navigateToSettings
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.settings_svgrepo_com),
+                            contentDescription = Constants.DESCRIPTION_ICON_SETTINGS
+                        )
+                    }
                     ButtonNew(
                         onClick = navigateToNewFileExplorer
                     )
+
                 }
             }
         }
@@ -187,7 +197,7 @@ fun Header() {
     Text(
         text = Constants.HEADER_LOGIN,
         fontSize = Constants.SIZE_TEXT_TITLE.sp
-    );
+    )
 }
 
 /**

@@ -14,6 +14,7 @@ import dev.gerardomarquez.simplepasswordmanager.views.Login
 import dev.gerardomarquez.simplepasswordmanager.views.Main
 import dev.gerardomarquez.simplepasswordmanager.views.NewFileExplorerView
 import dev.gerardomarquez.simplepasswordmanager.views.OpenFileExplorerView
+import dev.gerardomarquez.simplepasswordmanager.views.Settings
 
 /**
  * Clase que gestionara la navegacion entre pantallas de la aplicacion
@@ -38,6 +39,9 @@ fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewMo
                 },
                 navigateToNewFileExplorer = {
                     navigationController.navigate(ScreNewFileExplorer)
+                },
+                navigateToSettings = {
+                    navigationController.navigate(ScreSettings)
                 }
             )
         }
@@ -102,6 +106,14 @@ fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewMo
                 viewModel = viewModel,
                 idPasswordInformation = idPasswordInformation.idPasswordInformation,
                 navigateToMain = {
+                    navigationController.popBackStack()
+                }
+            )
+        }
+        composable<ScreSettings> {
+            Settings(
+                modifier = modifier,
+                navigateToLogin = {
                     navigationController.popBackStack()
                 }
             )

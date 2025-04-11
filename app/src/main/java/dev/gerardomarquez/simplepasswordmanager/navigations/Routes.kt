@@ -28,3 +28,6 @@ data class ScreUpdatePassword(val idPasswordInformation: Int)
 
 @Serializable
 object ScreFilters
+
+@Serializable
+object ScreSettings

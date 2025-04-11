@@ -1,5 +1,7 @@
 package dev.gerardomarquez.simplepasswordmanager.utils
 
+import android.util.Base64
+
 /**
  * Clase que contendra las variables constantes que se usaran para todo el proyecto
  */
@@ -15,6 +17,7 @@ class Constants {
         val HEADER_FILTERS: String = "Configuración de filtros de busqueda";
         val HEADER_NEW_FILE_EXPLORER: String = "Selecciona la carpeta de guardado";
         val HEADER_OPEN_FILE_EXPLORER: String = "Selecciona un archivo para visualizarlo";
+        val HEADER_SETTINGS: String = "Configuraciones de la aplicacion";
 
         /**
          * Descripciones de imageners
@@ -77,7 +80,9 @@ class Constants {
         val DESCRIPTION_FOLDER_SELECTED: String = "Seleccionar folder"
         val DESCRIPTION_FILE_SELECTED: String = "Seleccionar archivo"
         val DESCRIPTION_ICON_NEW: String = "Abrir explorador de archivos"
+        val DESCRIPTION_ICON_SETTINGS: String = "Abrir configuracion de aplicacion"
         val DESCRIPTION_ICON_REFRESH: String = "Generar contraseña"
+        val DESCRIPTION_ICON_REFRESH_SALT: String = "Generar salt"
         val DESCRIPTION_ICON_BACK_FOLDER: String = "Regresar a la carpeta anterior"
         val DESCRIPTION_DATA_INPUT_TITLE: String = "Ej. Cuenta de Facebook"
         val DESCRIPTION_DATA_INPUT_USER: String = "Ej. JuanP096"
@@ -185,6 +190,7 @@ class Constants {
         val TXT_SPECIAL_CHARACTERS_CHEK: String = "Incluir caracteres especiales"
         val TXT_USE_PASSWORD_GENERATED: String = "Usar"
         val TXT_COPY_PASSWORD_GENERATED: String = "Copiar"
+        val TXT_SETTINGS_SALT: String = "Cambiar salt:"
 
 
         /**
@@ -227,5 +233,7 @@ class Constants {
          */
         const val QUERY_SELECT_ALL: String = "SELECT * FROM passwords_informations"
         const val QUERY_SELECT_ONE_BY_ID: String = "SELECT * FROM passwords_informations WHERE id = :id"
+
+        private val B64_SALT: String = "VGVzdFNhbHRAMTIzNA==" // Solo pruebas, se tiene que cambiar por un salt seguro, no se si hacer otra seccion para que el usuario pueda generar uno seguro y aleatorio
     }
 }

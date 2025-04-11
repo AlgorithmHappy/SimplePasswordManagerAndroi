@@ -5,6 +5,18 @@ import android.net.Uri
 import android.os.Environment
 import androidx.documentfile.provider.DocumentFile
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import javax.crypto.Cipher
+import javax.crypto.CipherInputStream
+import javax.crypto.CipherOutputStream
+import javax.crypto.SecretKey
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
+import com.lambdapioneer.argon2kt.Argon2Kt
+import com.lambdapioneer.argon2kt.Argon2KtResult
+import com.lambdapioneer.argon2kt.Argon2Mode
+import java.security.SecureRandom
 
 /**
 * Metodo que obtiene todas las carpetas que se encuentran en el directorio que se le pase
@@ -81,4 +93,78 @@ data class CharactersIncludedInPassword (
             throw IllegalArgumentException(Constants.TXT_ERROR_CHRACTER_TYPE)
         }
     }
+}
+
+/**
+ * Metodo para encriptar la base de datos creada
+ * @param inputDataBaseFile Archivo .db de la base de datos en claro
+ * @param outputFile Archivo .db encriptado
+ * @param secretKey Password que introdujo el usuario pero ya transformado con Argon2 para ser valido
+ */
+fun encryptDatabaseFile(
+    inputDataBaseFile: File,
+    outputDatabaseFile: File,
+    secretKey: SecretKey
+) {
+    val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+    cipher.init(Cipher.ENCRYPT_MODE, secretKey) // IV aleatorio automático
+    val iv = cipher.iv // Obtener el IV generado
+
+    FileOutputStream(outputDatabaseFile).use { output ->
+        output.write(iv) // Guardar IV al inicio del archivo
+        CipherOutputStream(output, cipher).use { cryptoOut ->
+            FileInputStream(inputDataBaseFile).use { input ->
+                input.copyTo(cryptoOut)
+            }
+        }
+    }
+}
+
+/**
+ * Metodo para desencriptar la base de datos creada y que la pueda abrir room
+ * @param inputDataBaseFile Archivo .db encriptado
+ * @param outputDatabaseFile Archivo .db de la base de datos en claro listo para ser utilizado con room
+ * @param secretKey Password que introdujo el usuario pero ya transformado con Argon2 para ser valido
+ */
+fun decryptDatabaseFile(
+    inputDataBaseFile: File,
+    outputDatabaseFile: File,
+    secretKey: SecretKey
+) {
+    FileInputStream(inputDataBaseFile).use { input ->
+        val iv = ByteArray(16)
+        input.read(iv) // Leer IV almacenado
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec(iv))
+
+        CipherInputStream(input, cipher).use { cryptoIn ->
+            FileOutputStream(outputDatabaseFile).use { output ->
+                cryptoIn.copyTo(output)
+            }
+        }
+    }
+}
+
+/**
+ * Metodo para generar un secret key a partir del password que introdujo el usuario
+ * @param password Password que introdujo el usuario
+ * @param salt Salt que se le pasara al algoritmo Argon2, este salt debera ser diferente por cada
+ * base de datos que se cree para mayor seguridad
+ */
+fun generateSecretKey(password: String, salt: ByteArray): SecretKey {
+    val argon2 = Argon2Kt()
+
+    // Configuración segura (ajusta según necesidades):
+    val result: Argon2KtResult = argon2.hash(
+        mode = Argon2Mode.ARGON2_ID,
+        tCostInIterations = 5,
+        mCostInKibibyte = 65536,
+        parallelism = 4,            // Hilos en paralelo
+        password = password.toByteArray(),
+        salt = salt,
+        hashLengthInBytes = 32             // 32 bytes = clave AES-256
+    )
+
+    // Convierte el hash resultante en una SecretKey AES
+    return SecretKeySpec(result.rawHashAsByteArray(), "AES")
 }

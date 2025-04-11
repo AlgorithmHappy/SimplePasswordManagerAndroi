@@ -15,6 +15,7 @@ kotlinSerializationVersion = "1.7.3"
 documentfile = "1.0.1"
 roomVersion = "2.6.1"
 kspVersion = "2.1.20-1.0.32"
+argon2ktVersion = "1.6.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,6 +40,7 @@ androidx-documentfile = { group = "androidx.documentfile", name = "documentfile"
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomVersion" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
+password-security = { module = "com.lambdapioneer.argon2kt:argon2kt", version.ref = "argon2ktVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

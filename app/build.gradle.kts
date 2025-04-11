@@ -57,8 +57,8 @@ dependencies {
     implementation(libs.androidx.navigation)
     implementation(libs.kotlin.serialization.json)
     implementation(libs.androidx.documentfile)
-    //implementation(libs.androidx.room)
-    ksp(libs.androidx.room.compiler.get())//Esta esta dando error
+    implementation(libs.password.security)
+    ksp(libs.androidx.room.compiler.get())
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
