@@ -137,6 +137,7 @@ class Constants {
         val TEXT_BUTTON_SAVE_FILE: String = "Guardar archivo";
         val TEXT_BUTTON_NEW_INSERT: String = "Insertar nuevo";
         val TEXT_BUTTON_SAVE_FILTERS: String = "Guardar filtros";
+        val TEXT_BUTTON_SAVE_SALT: String = "Guardar";
         val TEXT_BUTTON_SELECT: String = "Seleccionar"
         val TEXT_BUTTON_SELECT_FILE: String = "Seleccionar archivo"
         val TEXT_INSERT_VIEW_INSTRUCTIONS: String = "Los campos marcados con \"*\" son obligatorios y el campo titulo debe ser unico"
@@ -191,7 +192,8 @@ class Constants {
         val TXT_USE_PASSWORD_GENERATED: String = "Usar"
         val TXT_COPY_PASSWORD_GENERATED: String = "Copiar"
         val TXT_SETTINGS_SALT: String = "Cambiar salt:"
-
+        val TXT_SETTINGS_SALT_SELECT: String = "Elegir uno creado previamente:"
+        val TXT_SETTINGS_SALT_WARNING: String = "*El \"salt\" es como el candado de tu contraseña, si se cambia el salt la contraseña se vuelve irreconocible. Guardar el salt junto con tu contraseña"
 
         /**
          * Textos de propiedades de configuracion
@@ -204,6 +206,7 @@ class Constants {
         val SETTINGS_FILTERS_URL: String = "filters_url"
         val SETTINGS_FILTERS_EMAIL: String = "filters_email"
         val SETTINGS_FILTERS_NUMBER: String = "filters_number"
+        val SETTINGS_LIST_SALT: String = "salt_list"
 
         /**
          * Tamaños de dp's

@@ -168,3 +168,15 @@ fun generateSecretKey(password: String, salt: ByteArray): SecretKey {
     // Convierte el hash resultante en una SecretKey AES
     return SecretKeySpec(result.rawHashAsByteArray(), "AES")
 }
+
+/**
+ * Metodo para convertir un String hexadecimal ingresado por el usuario a un ByteArray
+ * @param hexString hexadecimial valido para los salts
+ */
+fun hexStringToByteArray(hexString: String): ByteArray {
+    val hexPattern: String = "^[0-9a-fA-F]+\$"
+    require(hexString.length == 32) { "El texto hexadecimal debe tener una longitud de 32 caracteres 16 bytes" }
+    require(hexString.matches(hexPattern.toRegex() ) ) { "El valor ingresado no es hexadecimal" }
+
+    return hexString.chunked(2).map { it.toInt(16).toByte() }.toByteArray()
+}

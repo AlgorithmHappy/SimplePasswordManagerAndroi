@@ -27,6 +27,7 @@ object SettingsDataStore {
     private val FILTERS_KEY_URL = stringPreferencesKey(name = Constants.SETTINGS_FILTERS_URL)
     private val FILTERS_KEY_EMAIL = stringPreferencesKey(name = Constants.SETTINGS_FILTERS_EMAIL)
     private val FILTERS_KEY_NUMBER = stringPreferencesKey(name = Constants.SETTINGS_FILTERS_NUMBER)
+    private val LIST_SALT_KEY = stringPreferencesKey(name = Constants.SETTINGS_LIST_SALT)
 
     /**
      * Guarda una ruta de una base de datos, esta ruta debe ser la ultima que se creo
@@ -107,5 +108,45 @@ object SettingsDataStore {
             )
         }
         return flowAllFilters.first()
+    }
+
+    /**
+     * Guarda una SALT para derivar el password igresado por el usuario y que dicho password sea valido
+     * @param context Contexto de la aplicación
+     * @param hexadecimalSalt Salt en exadecimal para que despues se convirta en un byteArray y que
+     * lo pueda utilizar la libreria de derivacion argon2
+     */
+    suspend fun saveOneHexadecimalSalt(context: Context, hexadecimalSalt: String) {
+        var listDatabasesPaths = getAllHexadecimalSalt(context).toMutableList()
+        if(listDatabasesPaths.contains(hexadecimalSalt) )
+            listDatabasesPaths.remove(hexadecimalSalt)
+        listDatabasesPaths.add(Constants.GLOBAL_START_INDEX, hexadecimalSalt)
+        saveAllHexadecimalSalt(context, listDatabasesPaths)
+    }
+
+    /**
+     * Guarda la lista de SALT's generados por el usuario, la primera es la ultima en
+     * ser agregada
+     * @param context Contexto de la aplicación
+     * @param listHexadecimalSalt Lista de todos los salts generados por el usuario
+     */
+    suspend fun saveAllHexadecimalSalt(context: Context, listHexadecimalSalt: List<String>) {
+        val jsonList = Json.encodeToString(listHexadecimalSalt)
+        context.dataStore.edit { settings ->
+            settings[LIST_SALT_KEY] = jsonList
+        }
+    }
+
+    /**
+     * Consulta todos los salts generados por el usuario
+     * @param context Contexto de la aplicación
+     * @return Lista de todos los salts generados por el usuario
+     */
+    suspend fun getAllHexadecimalSalt(context: Context): List<String> {
+        val flowDatabasesPaths = context.dataStore.data.map { settings ->
+            settings[LIST_SALT_KEY] ?: Constants.GLOBAL_STR_LEFT_BRACKET + Constants.GLOBAL_STR_RIGHT_BRACKET
+        }
+        val jsonString: String = flowDatabasesPaths.first()
+        return Json.decodeFromString(jsonString)
     }
 }

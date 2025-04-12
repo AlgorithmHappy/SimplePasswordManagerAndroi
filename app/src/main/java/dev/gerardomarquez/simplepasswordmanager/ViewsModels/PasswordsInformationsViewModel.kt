@@ -15,9 +15,11 @@ import dev.gerardomarquez.simplepasswordmanager.dao.PasswordsInformationsDao
 import dev.gerardomarquez.simplepasswordmanager.entities.PasswordsInformations
 import dev.gerardomarquez.simplepasswordmanager.repositories.AllFilters
 import dev.gerardomarquez.simplepasswordmanager.repositories.SettingsDataStore
+import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import java.security.SecureRandom
 
 /**
  * Clase que representa el ViewModel de la vista Main, se esta ocupando el patron arquitectonico
@@ -39,10 +41,24 @@ class PasswordsInformationsViewModel(
     var stateFilters by mutableStateOf(AllFilters())
         private set
 
+    /**
+     * Estado que contiene la lista de salt que se han utilizado en la aplicacion
+     */
+    var stateListSalt by mutableStateOf(emptyList<String>())
+        private set
+
+    /**
+     * Estado que contiene el utlimo salt que utilizo el usuario
+     */
+    var stateSalt by mutableStateOf(String())
+        private set
+
     init {
         viewModelScope.launch {
             getAllPasswordsInformations()
             selectedAllFilters(context)
+            selectedAllSalt(context)
+            selectedOneSalt(context)
         }
     }
 
@@ -476,4 +492,61 @@ class PasswordsInformationsViewModel(
             )
         }
     }
+
+    /**
+     * Metodo que selecciona el salt actual de la aplicacion
+     * @param context Contexto de la aplicacion
+     */
+    private fun selectedAllSalt(context: Context){
+        viewModelScope.launch {
+            if(SettingsDataStore.getAllHexadecimalSalt(context = context).isEmpty() ){
+                SettingsDataStore.saveOneHexadecimalSalt(
+                    context = context,
+                    hexadecimalSalt = ByteArray(16).also { SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
+                )
+            }
+            stateListSalt = SettingsDataStore.getAllHexadecimalSalt(context = context)
+
+        }
+    }
+
+    /**
+     * Metodo que selecciona el salt actual de la aplicacion
+     * @param context Contexto de la aplicacion
+     */
+    private fun selectedOneSalt(context: Context){
+        viewModelScope.launch {
+            if(SettingsDataStore.getAllHexadecimalSalt(context = context).isEmpty() ){
+                SettingsDataStore.saveOneHexadecimalSalt(
+                    context = context,
+                    hexadecimalSalt = ByteArray(16).also { SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
+                )
+            }
+            stateSalt = SettingsDataStore.getAllHexadecimalSalt(context = context).first()
+
+        }
+    }
+
+    /**
+     * Metodo que guarda un salt
+     * @param context Contexto de la aplicacion
+     * @param salt Salt en hexadecimal
+     */
+    fun saveOneSalt(context: Context, salt: String){
+        viewModelScope.launch {
+            SettingsDataStore.saveOneHexadecimalSalt(context = context, hexadecimalSalt = salt)
+            stateListSalt = SettingsDataStore.getAllHexadecimalSalt(context = context)
+        }
+    }
+
+    /**
+     * Metodo que cambia el salt actual de la aplicacion
+     * @param salt nuevo salt en hexadecimal que se quiere agregar
+     */
+    fun changeSalt(salt: String){
+        viewModelScope.launch {
+            stateSalt = salt
+        }
+    }
+
 }

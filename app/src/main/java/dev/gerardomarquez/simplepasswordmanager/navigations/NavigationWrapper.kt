@@ -113,6 +113,7 @@ fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewMo
         composable<ScreSettings> {
             Settings(
                 modifier = modifier,
+                viewModel = viewModel,
                 navigateToLogin = {
                     navigationController.popBackStack()
                 }
