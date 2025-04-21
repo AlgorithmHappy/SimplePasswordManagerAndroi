@@ -19,11 +19,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -34,18 +35,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.gerardomarquez.simplepasswordmanager.R
 import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
-import dev.gerardomarquez.simplepasswordmanager.repositories.SettingsDataStore
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 import dev.gerardomarquez.simplepasswordmanager.utils.getFolders
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 /**
  * Metodo principal que ordena todos los elementos y variables que contendra la pantalla
@@ -58,6 +56,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun NewFileExplorerView(
     modifier: Modifier,
+    viewModel: PasswordsInformationsViewModel,
+    navigateToMain: () -> Unit,
     navigateToLogin: () -> Unit
 ){
     var folders by rememberSaveable { mutableStateOf(getFolders().toMutableList() ) }
@@ -160,17 +160,23 @@ fun NewFileExplorerView(
     InsertNameNewFile(
         show = showDialog,
         fileName = fileName,
+        password = viewModel.stateClearPasswordDb,
         onChangeFileName = {it -> fileName = it},
+        onChangePassword = {it -> viewModel.changeClearPasswordDb(password = it)},
         onClickOk = {
             showDialog = false
-            CoroutineScope(Dispatchers.IO).launch {
+            /*CoroutineScope(Dispatchers.IO).launch {
                 val completePath: String = selectedFolder + Constants.STR_SLASH + fileName
                 SettingsDataStore.saveOneDatabasePath(
                     context = context,
                     databasePath = completePath
                 )
-            }
-            navigateToLogin()
+            }*/
+            val completePath: String = selectedFolder + Constants.STR_SLASH + fileName
+            viewModel.saveOnePathDatabase(context = context, path = completePath)
+            viewModel.deleteTempDatabase(context = context) // Se borra la base de datos temporal porque ya que se va
+            // a crear una nueva base de datos esta tiene que estar limpia
+            navigateToMain()
         },
         onClickCancel = {
             showDialog = false
@@ -300,15 +306,18 @@ fun BackFolder(modifier: Modifier){
 fun InsertNameNewFile(
     show: Boolean,
     fileName: String,
+    password: String,
     onChangeFileName: (String) -> Unit,
+    onChangePassword: (String) -> Unit,
     onClickOk: () -> Unit,
     onClickCancel: () -> Unit
 ){
+    var textVisible by rememberSaveable { mutableStateOf(value = false) }
     if(show) {
         BasicAlertDialog(
             modifier = Modifier
-                .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_WIDTH)
-                .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_HEIGHT),
+                .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_NEW_FILE_WIDTH)
+                .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_NEW_FILE_HEIGHT),
             onDismissRequest = onClickCancel,
         ) {
             Column(
@@ -327,9 +336,31 @@ fun InsertNameNewFile(
                     text = Constants.TEXT_ALERT_DIALOG_NEW_FILE,
                     textAlign = TextAlign.Center
                 )
-                TextField(
+                OutlinedTextField(
                     value = fileName,
                     onValueChange = onChangeFileName
+                )
+                Text(
+                    text = Constants.TEXT_ALERT_DIALOG_NEW_FILE_PASSWORD,
+                    textAlign = TextAlign.Center
+                )
+                OutlinedTextField(
+                    value = password,
+                    enabled = false,
+                    onValueChange = {}/*onChangePassword*/,
+                    visualTransformation = if (textVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        val icon = if (textVisible) painterResource(R.drawable.eye_closed_svgrepo_com) else painterResource(
+                            R.drawable.eye_svgrepo_com)
+                        IconButton(
+                            onClick = { textVisible = !textVisible }
+                        ) {
+                            Icon(
+                                painter = icon,
+                                contentDescription = Constants.DESCRIPTION_PASSWORD_VISIBILITY
+                            )
+                        }
+                    }
                 )
                 Row(
                     modifier = Modifier
@@ -354,7 +385,7 @@ fun InsertNameNewFile(
     }
 }
 
-@Composable
+/*@Composable
 @Preview(
     showBackground = true
 )
@@ -364,5 +395,5 @@ fun NewFileExplorerPreview() {
             .fillMaxSize(),
         navigateToLogin = {}
     )
-}
+}*/
 

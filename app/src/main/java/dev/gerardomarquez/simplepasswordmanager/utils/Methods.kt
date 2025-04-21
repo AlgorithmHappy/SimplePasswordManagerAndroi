@@ -180,3 +180,13 @@ fun hexStringToByteArray(hexString: String): ByteArray {
 
     return hexString.chunked(2).map { it.toInt(16).toByte() }.toByteArray()
 }
+
+/**
+ * Metodo que genera un archivo de texto con el salt de la base de datos encriptada
+ * @param path Ruta donde se guardara el archivo
+ * @param salt Salt con el que se encripto la contraseña en claro
+ */
+fun generateFileSalt(path: String, salt: String){
+    val file: File = File(path)
+    file.writeText(salt)
+}

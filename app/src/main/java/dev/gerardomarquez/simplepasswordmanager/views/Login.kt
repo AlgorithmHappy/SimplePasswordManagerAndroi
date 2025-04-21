@@ -1,6 +1,5 @@
 package dev.gerardomarquez.simplepasswordmanager.views
 
-import android.annotation.SuppressLint
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,12 +39,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
-import dev.gerardomarquez.simplepasswordmanager.repositories.SettingsDataStore
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.runtime.LaunchedEffect
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
+import dev.gerardomarquez.simplepasswordmanager.utils.decryptDatabaseFile
 
 /**
  * Metodo principal que encapsulara todos los elementos de la vista para realizar el login de la
@@ -56,25 +53,13 @@ import kotlinx.coroutines.withContext
 @Composable
 fun Login(
     modifier: Modifier,
+    viewModel: PasswordsInformationsViewModel,
     navigateToMain: () -> Unit,
     navigateToFolderFileExplorer: (String) -> Unit,
     navigateToNewFileExplorer: () -> Unit,
     navigateToSettings: () -> Unit
 ) {
     val context: Context = LocalContext.current
-    var password by rememberSaveable { mutableStateOf(value = String()) }
-    // Variables para el dropdown
-    var options by rememberSaveable { mutableStateOf(mutableListOf<String>() ) }
-    LaunchedEffect(Unit) { // Se abre hilo aparte para obtener los valores del dataStore
-        withContext(Dispatchers.IO) { // Hilo de IO
-            val list = SettingsDataStore.getDatabasesPaths(context).toList().map {
-                iterator ->
-                iterator.split(Constants.STR_SLASH).last() // Se obtiene solo el nombre de la base de datos
-            }
-            options = list.toMutableList()
-        }
-    }
-    var selectedOption by rememberSaveable { mutableStateOf(value = options.firstOrNull() ?: Constants.GLOBAL_SELECCIONAR ) }
     var selectedFolderUriStr by rememberSaveable { mutableStateOf(value = "") }
     val folderPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
@@ -127,10 +112,10 @@ fun Login(
                         modifier = Modifier.weight(Constants.WEIGHT_LAYOUT_DROP_DOWN)
                     ){
                         DataBasesDropDown(
-                            options = options,
-                            selectedOption = selectedOption,
+                            options = viewModel.stateListFilesNames,
+                            selectedOption = if(viewModel.stateSelectedFileName.isBlank() ) Constants.GLOBAL_SELECCIONAR else viewModel.stateSelectedFileName,
                             onOptionSelected = {
-                                selectedOption = it
+                                viewModel.changeSelectedFileName(fileName = it)
                             }
                         )
                     }
@@ -150,8 +135,10 @@ fun Login(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Password(
-                        password = password,
-                        onPasswordChange = { password = it }
+                        password = viewModel.stateClearPasswordDb,
+                        onPasswordChange = {
+                            viewModel.changeClearPasswordDb(password = it)
+                        }
                     )
                 }
                 Row(
@@ -160,7 +147,9 @@ fun Login(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     ButtonLogin(
-                        onClick = navigateToMain
+                        onClick = {
+                            navigateToMain()
+                        }
                     )
                 }
                 Spacer(

@@ -12,13 +12,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.gerardomarquez.simplepasswordmanager.ListStatePaswordInformation
 import dev.gerardomarquez.simplepasswordmanager.StatePaswordInformation
 import dev.gerardomarquez.simplepasswordmanager.dao.PasswordsInformationsDao
+import dev.gerardomarquez.simplepasswordmanager.database.AppDatabase
 import dev.gerardomarquez.simplepasswordmanager.entities.PasswordsInformations
 import dev.gerardomarquez.simplepasswordmanager.repositories.AllFilters
 import dev.gerardomarquez.simplepasswordmanager.repositories.SettingsDataStore
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
+import dev.gerardomarquez.simplepasswordmanager.utils.encryptDatabaseFile
+import dev.gerardomarquez.simplepasswordmanager.utils.generateFileSalt
+import dev.gerardomarquez.simplepasswordmanager.utils.generateSecretKey
+import dev.gerardomarquez.simplepasswordmanager.utils.hexStringToByteArray
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import java.io.File
 import java.security.SecureRandom
 
 /**
@@ -26,7 +32,7 @@ import java.security.SecureRandom
  * MVVM (Model-View-ViewModel)
  */
 class PasswordsInformationsViewModel(
-    private val passwordInformationDao: PasswordsInformationsDao,
+    private var passwordInformationDao: PasswordsInformationsDao,
     context: Context
 ) : ViewModel() {
     /**
@@ -49,9 +55,35 @@ class PasswordsInformationsViewModel(
 
     /**
      * Estado que contiene el utlimo salt que utilizo el usuario
-     */
+     *///
     var stateSalt by mutableStateOf(String())
         private set
+
+    /**
+     * Estado de la contraseña en claro
+     */
+    var stateClearPasswordDb by mutableStateOf(String())
+        private set
+
+    /**
+     * Lista de paths de las bases de datos
+     */
+    var stateListPaths by mutableStateOf(emptyList<String>() )
+        private set
+
+    /**
+     * Lista de paths de las bases de datos
+     */
+    var stateSelectedPath by mutableStateOf(String() )
+        private set
+
+    /**
+     * Lista de nombres de archivos sin extension de la base de datos
+     */
+    var stateListFilesNames by mutableStateOf(emptyList<String>() )
+        private set
+
+    var stateSelectedFileName by mutableStateOf(String() )
 
     init {
         viewModelScope.launch {
@@ -59,6 +91,10 @@ class PasswordsInformationsViewModel(
             selectedAllFilters(context)
             selectedAllSalt(context)
             selectedOneSalt(context)
+            selectedAllListPaths(context)
+            selectedAllListFileNames(context)
+            //changeSelectedFileName(Constants.GLOBAL_SELECCIONAR)
+            //Log.d("viewModelinit", "inicio")
         }
     }
 
@@ -549,4 +585,133 @@ class PasswordsInformationsViewModel(
         }
     }
 
+    /**
+     * Metodo que cambia la contraseña en claro de la base de datos
+     * @param password Contraseña en claro que se quiere cambiar
+     */
+    fun changeClearPasswordDb(password: String){
+        stateClearPasswordDb = password
+    }
+
+    /**
+     * Metodo que inicializa la lista de los paths de las bases de datos
+     * @param context Contexto de la aplicacion
+     */
+    fun selectedAllListPaths(context: Context){
+        viewModelScope.launch {
+            stateListPaths = SettingsDataStore.getDatabasesPaths(context = context)
+        }
+    }
+
+    /**
+     * Metodo que cambia el path seleccionado
+     * @path Path seleccionado
+     */
+    fun changeSelectedPath(path: String){
+        viewModelScope.launch {
+            stateSelectedPath = path
+        }
+    }
+
+    /**
+     * Metodo que guarda el path de una base de datos
+     * @context Contexto de la aplicacion
+     * @path Path a guardar
+     */
+    fun saveOnePathDatabase(context: Context, path: String){
+        viewModelScope.launch {
+            SettingsDataStore.saveOneDatabasePath(
+                context = context,
+                databasePath = path
+            )
+        }
+        selectedAllListPaths(context)
+    }
+
+    /**
+     * Metodo que inicializa la lista de los nombres de los archivos sin extension
+     * @param context Contexto de la aplicacion
+     */
+    fun selectedAllListFileNames(context: Context) {
+        viewModelScope.launch {
+            if(stateListPaths.isEmpty() ){
+                stateListFilesNames = SettingsDataStore
+                    .getDatabasesPaths(context = context)
+                    .toList().map {
+                        iterator ->
+                        iterator.split(Constants.STR_SLASH).last().replace(".db", "") // Se obtiene solo el nombre de la base de datos
+                    }
+            } else {
+                stateListFilesNames = stateListPaths.map {
+                        iterator ->
+                    iterator.split(Constants.STR_SLASH).last().replace(".db", "") // Se obtiene solo el nombre de la base de datos
+                }
+            }
+        }
+    }
+
+    /**
+     * Metodo que cambia el nombre del archivo seleccionado
+     * @param fileName Nombre del archivo seleccionado
+     */
+    fun changeSelectedFileName(fileName: String){
+        viewModelScope.launch {
+            stateSelectedFileName = fileName
+        }
+    }
+
+    /**
+     * Metodo que verifica si el archivo existe o no, para saber si se va a crear un nuevo archivo ya
+     * que posiblemente el usuario presiono el boton de new archivo en el login, el path es el actual
+     * de este mismo viewmodel
+     * @param path Ruta del archivo que se quiere verificar
+     */
+    fun verifyFileExists(): Boolean {
+        val file = File(stateSelectedPath)
+        return file.exists()
+    }
+
+    /**
+     * Metodo que elimina la base de datos temporal que crea room en la que se trabaja, esto se hace
+     * por seguridad para que no quede rastro de que se intento crear un archivo con passwords que no
+     * se guardo, si no se guarda explicitamente se tiene que eliminar porque la hace de una base
+     * de datos temporal
+     */
+    fun deleteTempDatabase(context: Context){
+        val database = AppDatabase.resetDatabase(context = context)
+        passwordInformationDao = database.passwordsInformationsDao()
+        if(!state.listPaswordInformation.isEmpty() ){
+            state = state.copy(// Se limpia la lista de passwords porque se elimino la base de datos
+                listPaswordInformation = emptyList(),
+                ready = true
+            )
+        }
+    }
+
+    /**
+     * Metodo que guarda la base de datos encriptada con la base de datos en claro temporal
+     */
+    fun saveTempDatabaseEncrypted(context: Context, password: String){
+        viewModelScope.launch {
+            stateClearPasswordDb = password
+            val inputFile = File(Constants.PATH_TMP_DATABASE)
+            val outputFile = File(stateSelectedPath)
+            encryptDatabaseFile(
+                inputDataBaseFile = inputFile,
+                outputDatabaseFile = outputFile,
+                secretKey = generateSecretKey(
+                    password = stateClearPasswordDb,
+                    salt = hexStringToByteArray(
+                        hexString = stateSalt
+                    )
+                )
+            )
+            val fileNameDb = stateSelectedPath.split(Constants.STR_SLASH).last()
+            val finalPath = stateSelectedPath.replace(fileNameDb, Constants.SALT_FILE_NAME)
+            generateFileSalt(
+                path = finalPath,
+                salt = stateSalt,
+            )
+        }
+    }
 }

@@ -1,6 +1,5 @@
 package dev.gerardomarquez.simplepasswordmanager
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,7 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
+import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModelFactory
 import dev.gerardomarquez.simplepasswordmanager.database.AppDatabase
 import dev.gerardomarquez.simplepasswordmanager.navigations.NavigationWrapper
 import dev.gerardomarquez.simplepasswordmanager.ui.theme.SimplePasswordManagerTheme
@@ -25,7 +26,9 @@ class MainActivity : ComponentActivity() {
         val dao = database.passwordsInformationsDao()
 
         setContent {
-            val viewModel = PasswordsInformationsViewModel(dao, LocalContext.current)
+            val context = LocalContext.current
+            val factory = PasswordsInformationsViewModelFactory(dao, context)
+            val viewModel: PasswordsInformationsViewModel = viewModel(factory = factory)
             SimplePasswordManagerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NavigationWrapper(

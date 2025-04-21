@@ -30,6 +30,7 @@ fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewMo
         composable<ScreLogin>{
             Login(
                 modifier = modifier,
+                viewModel = viewModel,
                 navigateToMain = {
                     navigationController.navigate(ScreMain)
                 },
@@ -55,6 +56,9 @@ fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewMo
                 navigateToInsert = {
                     navigationController.navigate(ScreInsertPassword)
                 },
+                navigateToLogin = {
+                    navigationController.navigate(ScreLogin)
+                },
                 navigateToUpdate = {
                     idPasswordInformation ->
                     navigationController.navigate(ScreUpdatePassword(idPasswordInformation = idPasswordInformation) )
@@ -64,6 +68,10 @@ fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewMo
         composable<ScreNewFileExplorer> {
             NewFileExplorerView(
                 modifier = modifier,
+                viewModel = viewModel,
+                navigateToMain = {
+                    navigationController.navigate(ScreMain)
+                },
                 navigateToLogin = {
                     navigationController.popBackStack()
                 }

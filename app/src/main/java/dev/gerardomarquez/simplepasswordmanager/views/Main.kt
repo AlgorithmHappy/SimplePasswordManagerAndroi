@@ -78,6 +78,7 @@ fun Main(
     viewModel: PasswordsInformationsViewModel,
     navigateToFilters: () -> Unit,
     navigateToInsert: () -> Unit,
+    navigateToLogin: () -> Unit,
     navigateToUpdate: (Int) -> Unit,
 ){
     val density = LocalDensity.current // Obtener la densidad de la pantalla
@@ -237,6 +238,8 @@ fun Main(
         show = confirmationDialog,
         onDismissRequest = {
             confirmationDialog = false
+
+            navigateToLogin()
         }
     )
 

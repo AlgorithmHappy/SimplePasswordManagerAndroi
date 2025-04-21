@@ -26,5 +26,26 @@ abstract class AppDatabase : RoomDatabase() {
                 instance
             }
         }
+
+        /**
+         * Metodo que elimina la base de datos y crea una nueva sin registros
+         * @param context Contexto de la aplicacion
+         * @return Nueva instancia de la base de datos limpia
+         */
+        fun resetDatabase(context: Context): AppDatabase {
+            synchronized(this) {
+                // 1. Cerrar si existe
+                INSTANCE?.close()
+                INSTANCE = null
+
+                // 2. Borrar los archivos de la base de datos
+                context.deleteDatabase("tmp_database")
+
+                // 3. Crear nueva instancia inmediatamente
+                val newInstance = getInstance(context)
+                INSTANCE = newInstance
+                return newInstance
+            }
+        }
     }
 }
