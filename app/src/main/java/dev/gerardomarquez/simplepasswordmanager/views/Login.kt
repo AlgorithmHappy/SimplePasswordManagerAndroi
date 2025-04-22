@@ -116,6 +116,9 @@ fun Login(
                             selectedOption = if(viewModel.stateSelectedFileName.isBlank() ) Constants.GLOBAL_SELECCIONAR else viewModel.stateSelectedFileName,
                             onOptionSelected = {
                                 viewModel.changeSelectedFileName(fileName = it)
+                                val indexFileName: Int = viewModel.stateListFilesNames.indexOf(it)
+                                val pathSelected: String = viewModel.stateListPaths[indexFileName]
+                                viewModel.changeSelectedPath(path = pathSelected)
                             }
                         )
                     }
@@ -148,6 +151,7 @@ fun Login(
                 ) {
                     ButtonLogin(
                         onClick = {
+                            viewModel.replaceEncryptedDBForTmpDB()
                             navigateToMain()
                         }
                     )

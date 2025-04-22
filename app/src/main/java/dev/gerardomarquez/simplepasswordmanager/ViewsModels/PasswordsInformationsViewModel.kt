@@ -17,6 +17,7 @@ import dev.gerardomarquez.simplepasswordmanager.entities.PasswordsInformations
 import dev.gerardomarquez.simplepasswordmanager.repositories.AllFilters
 import dev.gerardomarquez.simplepasswordmanager.repositories.SettingsDataStore
 import dev.gerardomarquez.simplepasswordmanager.utils.Constants
+import dev.gerardomarquez.simplepasswordmanager.utils.decryptDatabaseFile
 import dev.gerardomarquez.simplepasswordmanager.utils.encryptDatabaseFile
 import dev.gerardomarquez.simplepasswordmanager.utils.generateFileSalt
 import dev.gerardomarquez.simplepasswordmanager.utils.generateSecretKey
@@ -691,7 +692,7 @@ class PasswordsInformationsViewModel(
     /**
      * Metodo que guarda la base de datos encriptada con la base de datos en claro temporal
      */
-    fun saveTempDatabaseEncrypted(context: Context, password: String){
+    fun saveTempDatabaseEncrypted(password: String){
         viewModelScope.launch {
             stateClearPasswordDb = password
             val inputFile = File(Constants.PATH_TMP_DATABASE)
@@ -707,10 +708,32 @@ class PasswordsInformationsViewModel(
                 )
             )
             val fileNameDb = stateSelectedPath.split(Constants.STR_SLASH).last()
-            val finalPath = fileNameDb + stateSelectedPath.replace(fileNameDb, Constants.SALT_FILE_NAME)
+            val finalPath = stateSelectedPath.replace(fileNameDb, fileNameDb + Constants.SALT_FILE_NAME)
             generateFileSalt(
                 path = finalPath,
                 salt = stateSalt,
+            )
+        }
+    }
+
+    /**
+     * Metodo que reemplaza la base de datos actual por la base de datos que eligio el usuario en el
+     * login, este metodo desencripta los binarios y pone el archivo en la base temporal para que
+     * lo pueda abrir room
+     */
+    fun replaceEncryptedDBForTmpDB(){
+        viewModelScope.launch {
+            val inputFile = File(stateSelectedPath)
+            val outputFile = File(Constants.PATH_TMP_DATABASE)
+            decryptDatabaseFile(
+                inputDataBaseFile = inputFile,
+                outputDatabaseFile = outputFile,
+                secretKey = generateSecretKey(
+                    password = stateClearPasswordDb,
+                    salt = hexStringToByteArray(
+                        hexString = stateSalt
+                    )
+                )
             )
         }
     }

@@ -238,7 +238,6 @@ fun Main(
         show = confirmationDialog,
         onClickOk = {
             viewModel.saveTempDatabaseEncrypted(
-                context = context,
                 password = viewModel.stateClearPasswordDb
             )
             confirmationDialog = false
@@ -246,7 +245,6 @@ fun Main(
         },
         onDismissRequest = {
             viewModel.saveTempDatabaseEncrypted(
-                context = context,
                 password = viewModel.stateClearPasswordDb
             )
             confirmationDialog = false
