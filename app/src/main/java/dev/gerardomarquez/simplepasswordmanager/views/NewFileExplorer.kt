@@ -173,6 +173,7 @@ fun NewFileExplorerView(
                 )
             }*/
             val completePath: String = selectedFolder + Constants.STR_SLASH + fileName
+            viewModel.changeSelectedPath(path = completePath)
             viewModel.saveOnePathDatabase(context = context, path = completePath)
             viewModel.deleteTempDatabase(context = context) // Se borra la base de datos temporal porque ya que se va
             // a crear una nueva base de datos esta tiene que estar limpia
@@ -346,8 +347,7 @@ fun InsertNameNewFile(
                 )
                 OutlinedTextField(
                     value = password,
-                    enabled = false,
-                    onValueChange = {}/*onChangePassword*/,
+                    onValueChange = onChangePassword,
                     visualTransformation = if (textVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         val icon = if (textVisible) painterResource(R.drawable.eye_closed_svgrepo_com) else painterResource(

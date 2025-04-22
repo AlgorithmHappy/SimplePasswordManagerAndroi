@@ -707,7 +707,7 @@ class PasswordsInformationsViewModel(
                 )
             )
             val fileNameDb = stateSelectedPath.split(Constants.STR_SLASH).last()
-            val finalPath = stateSelectedPath.replace(fileNameDb, Constants.SALT_FILE_NAME)
+            val finalPath = fileNameDb + stateSelectedPath.replace(fileNameDb, Constants.SALT_FILE_NAME)
             generateFileSalt(
                 path = finalPath,
                 salt = stateSalt,

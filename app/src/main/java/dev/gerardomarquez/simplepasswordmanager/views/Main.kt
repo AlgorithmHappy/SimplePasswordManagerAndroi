@@ -236,9 +236,20 @@ fun Main(
 
     DialogMain(
         show = confirmationDialog,
-        onDismissRequest = {
+        onClickOk = {
+            viewModel.saveTempDatabaseEncrypted(
+                context = context,
+                password = viewModel.stateClearPasswordDb
+            )
             confirmationDialog = false
-
+            navigateToLogin()
+        },
+        onDismissRequest = {
+            viewModel.saveTempDatabaseEncrypted(
+                context = context,
+                password = viewModel.stateClearPasswordDb
+            )
+            confirmationDialog = false
             navigateToLogin()
         }
     )
@@ -661,7 +672,11 @@ fun InformationPasswordDropDown(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DialogMain(show: Boolean, onDismissRequest: () -> Unit){
+fun DialogMain(
+    show: Boolean,
+    onClickOk: () -> Unit,
+    onDismissRequest: () -> Unit
+){
     if(show) {
         BasicAlertDialog(
             modifier = Modifier
@@ -685,7 +700,15 @@ fun DialogMain(show: Boolean, onDismissRequest: () -> Unit){
                     text = Constants.TEXT_ALERT_DIALOG_MAIN_SAVE,
                     textAlign = TextAlign.Center
                 )
-
+                OutlinedButton(
+                    shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp),
+                    onClick = onClickOk
+                ) {
+                    Text(
+                        text = Constants.TEXT_BUTTON_OK,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }
