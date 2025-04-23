@@ -22,8 +22,10 @@ import dev.gerardomarquez.simplepasswordmanager.utils.encryptDatabaseFile
 import dev.gerardomarquez.simplepasswordmanager.utils.generateFileSalt
 import dev.gerardomarquez.simplepasswordmanager.utils.generateSecretKey
 import dev.gerardomarquez.simplepasswordmanager.utils.hexStringToByteArray
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.io.File
 import java.security.SecureRandom
@@ -86,6 +88,21 @@ class PasswordsInformationsViewModel(
 
     var stateSelectedFileName by mutableStateOf(String() )
 
+    /**
+     * Señal que se ejecuta solo una vez para indicar que lanze un Toast de error en la vista
+     */
+    private val _errorDecryptUi = Channel<Boolean>()
+
+    /**
+     * Variable booleana que recive solo una vez la señal de true en caso de error o false si no hubo error
+     */
+    val errorDecryptUI = _errorDecryptUi.receiveAsFlow()
+
+    /**
+     * Variable que cambia para bloquear la pantalla de main si el login es incorrecto
+     */
+    var stateLockMain by mutableStateOf(true)
+
     init {
         viewModelScope.launch {
             getAllPasswordsInformations()
@@ -94,8 +111,6 @@ class PasswordsInformationsViewModel(
             selectedOneSalt(context)
             selectedAllListPaths(context)
             selectedAllListFileNames(context)
-            //changeSelectedFileName(Constants.GLOBAL_SELECCIONAR)
-            //Log.d("viewModelinit", "inicio")
         }
     }
 
@@ -662,25 +677,15 @@ class PasswordsInformationsViewModel(
     }
 
     /**
-     * Metodo que verifica si el archivo existe o no, para saber si se va a crear un nuevo archivo ya
-     * que posiblemente el usuario presiono el boton de new archivo en el login, el path es el actual
-     * de este mismo viewmodel
-     * @param path Ruta del archivo que se quiere verificar
-     */
-    fun verifyFileExists(): Boolean {
-        val file = File(stateSelectedPath)
-        return file.exists()
-    }
-
-    /**
      * Metodo que elimina la base de datos temporal que crea room en la que se trabaja, esto se hace
      * por seguridad para que no quede rastro de que se intento crear un archivo con passwords que no
      * se guardo, si no se guarda explicitamente se tiene que eliminar porque la hace de una base
      * de datos temporal
      */
     fun deleteTempDatabase(context: Context){
-        val database = AppDatabase.resetDatabase(context = context)
-        passwordInformationDao = database.passwordsInformationsDao()
+        /*val database = AppDatabase.resetDatabase(context = context)
+        passwordInformationDao = database.passwordsInformationsDao()*/
+        AppDatabase.deleteDatabase(context = context)
         if(!state.listPaswordInformation.isEmpty() ){
             state = state.copy(// Se limpia la lista de passwords porque se elimino la base de datos
                 listPaswordInformation = emptyList(),
@@ -690,16 +695,51 @@ class PasswordsInformationsViewModel(
     }
 
     /**
+     * Metodo que vuelve a abrir room con usa base de datos
+     */
+    fun conectNewDatabase(context: Context){
+        val database = AppDatabase.getInstance(context = context)
+        passwordInformationDao = database.passwordsInformationsDao()
+        getAllPasswordsInformations()
+    }
+
+    /**
      * Metodo que guarda la base de datos encriptada con la base de datos en claro temporal
      */
     fun saveTempDatabaseEncrypted(password: String){
         viewModelScope.launch {
             stateClearPasswordDb = password
-            val inputFile = File(Constants.PATH_TMP_DATABASE)
-            val outputFile = File(stateSelectedPath)
+            /*val inputFile = File(Constants.PATH_TMP_DATABASE)
+            val outputFile = File(stateSelectedPath)*/
+            val inputFile1 = File(Constants.PATH_TMP_DATABASE)
+            val outputFile1 = File(stateSelectedPath)
+            val inputFile2 = File(Constants.PATH_TMP_DATABASE + "-shm")
+            val outputFile2 = File(stateSelectedPath + "-shm")
+            val inputFile3 = File(Constants.PATH_TMP_DATABASE + "-wal")
+            val outputFile3 = File(stateSelectedPath + "-wal")
             encryptDatabaseFile(
-                inputDataBaseFile = inputFile,
-                outputDatabaseFile = outputFile,
+                inputDataBaseFile = inputFile1,
+                outputDatabaseFile = outputFile1,
+                secretKey = generateSecretKey(
+                    password = stateClearPasswordDb,
+                    salt = hexStringToByteArray(
+                        hexString = stateSalt
+                    )
+                )
+            )
+            encryptDatabaseFile(
+                inputDataBaseFile = inputFile2,
+                outputDatabaseFile = outputFile2,
+                secretKey = generateSecretKey(
+                    password = stateClearPasswordDb,
+                    salt = hexStringToByteArray(
+                        hexString = stateSalt
+                    )
+                )
+            )
+            encryptDatabaseFile(
+                inputDataBaseFile = inputFile3,
+                outputDatabaseFile = outputFile3,
                 secretKey = generateSecretKey(
                     password = stateClearPasswordDb,
                     salt = hexStringToByteArray(
@@ -723,18 +763,50 @@ class PasswordsInformationsViewModel(
      */
     fun replaceEncryptedDBForTmpDB(){
         viewModelScope.launch {
-            val inputFile = File(stateSelectedPath)
-            val outputFile = File(Constants.PATH_TMP_DATABASE)
-            decryptDatabaseFile(
-                inputDataBaseFile = inputFile,
-                outputDatabaseFile = outputFile,
-                secretKey = generateSecretKey(
-                    password = stateClearPasswordDb,
-                    salt = hexStringToByteArray(
-                        hexString = stateSalt
+            /*val inputFile = File(stateSelectedPath)
+            val outputFile = File(Constants.PATH_TMP_DATABASE)*/
+            val inputFile1 = File(stateSelectedPath)
+            val outputFile1 = File(Constants.PATH_TMP_DATABASE)
+            val inputFile2 = File(stateSelectedPath + "-shm")
+            val outputFile2 = File(Constants.PATH_TMP_DATABASE + "-shm")
+            val inputFile3 = File(stateSelectedPath + "-wal")
+            val outputFile3 = File(Constants.PATH_TMP_DATABASE + "-wal")
+            try {
+                decryptDatabaseFile(
+                    inputDataBaseFile = inputFile1,
+                    outputDatabaseFile = outputFile1,
+                    secretKey = generateSecretKey(
+                        password = stateClearPasswordDb,
+                        salt = hexStringToByteArray(
+                            hexString = stateSalt
+                        )
                     )
                 )
-            )
+                decryptDatabaseFile(
+                    inputDataBaseFile = inputFile2,
+                    outputDatabaseFile = outputFile2,
+                    secretKey = generateSecretKey(
+                        password = stateClearPasswordDb,
+                        salt = hexStringToByteArray(
+                            hexString = stateSalt
+                        )
+                    )
+                )
+                decryptDatabaseFile(
+                    inputDataBaseFile = inputFile3,
+                    outputDatabaseFile = outputFile3,
+                    secretKey = generateSecretKey(
+                        password = stateClearPasswordDb,
+                        salt = hexStringToByteArray(
+                            hexString = stateSalt
+                        )
+                    )
+                )
+                stateLockMain = false
+            } catch (exception: Exception){
+                _errorDecryptUi.send(true)
+                stateLockMain = true
+            }
         }
     }
 }

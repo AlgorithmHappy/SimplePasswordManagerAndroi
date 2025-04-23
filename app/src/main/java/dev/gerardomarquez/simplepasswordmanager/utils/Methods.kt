@@ -125,7 +125,11 @@ fun encryptDatabaseFile(
  * @param inputDataBaseFile Archivo .db encriptado
  * @param outputDatabaseFile Archivo .db de la base de datos en claro listo para ser utilizado con room
  * @param secretKey Password que introdujo el usuario pero ya transformado con Argon2 para ser valido
+ * @throws Exception Si ocurre un error al desencriptar el archivo (Como por ejemplo si el secretKey no es)
  */
+@Throws(
+    Exception::class
+)
 fun decryptDatabaseFile(
     inputDataBaseFile: File,
     outputDatabaseFile: File,

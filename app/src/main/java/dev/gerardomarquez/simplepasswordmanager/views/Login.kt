@@ -41,6 +41,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
+import androidx.compose.runtime.LaunchedEffect
 import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
 import dev.gerardomarquez.simplepasswordmanager.utils.decryptDatabaseFile
 
@@ -152,7 +154,10 @@ fun Login(
                     ButtonLogin(
                         onClick = {
                             viewModel.replaceEncryptedDBForTmpDB()
-                            navigateToMain()
+                            if(!viewModel.stateLockMain) {
+                                viewModel.conectNewDatabase(context = context)
+                                navigateToMain()
+                            }
                         }
                     )
                 }
@@ -177,6 +182,14 @@ fun Login(
                     )
 
                 }
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.errorDecryptUI.collect { showError ->
+            if (showError) {
+                Toast.makeText(context, Constants.TEXT_ERROR_PASSWORD, Toast.LENGTH_LONG).show()
             }
         }
     }

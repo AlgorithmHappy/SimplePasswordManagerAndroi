@@ -228,7 +228,12 @@ fun Main(
                     .weight(Constants.WEIGHT_LAYOUT_MAIN_BUTTONS)
                     .fillMaxHeight(),
                 onClick = {
+                    viewModel.saveTempDatabaseEncrypted(
+                        password = viewModel.stateClearPasswordDb
+                    )
                     confirmationDialog = true
+                    viewModel.deleteTempDatabase(context = context) // Se borra para que no quede
+                    // cache ni algun archivo en claro temporal   sd
                 }
             )
         }
@@ -237,16 +242,10 @@ fun Main(
     DialogMain(
         show = confirmationDialog,
         onClickOk = {
-            viewModel.saveTempDatabaseEncrypted(
-                password = viewModel.stateClearPasswordDb
-            )
             confirmationDialog = false
             navigateToLogin()
         },
         onDismissRequest = {
-            viewModel.saveTempDatabaseEncrypted(
-                password = viewModel.stateClearPasswordDb
-            )
             confirmationDialog = false
             navigateToLogin()
         }

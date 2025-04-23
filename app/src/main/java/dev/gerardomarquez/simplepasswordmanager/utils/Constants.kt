@@ -152,6 +152,7 @@ class Constants {
         val TEXT_ALERT_DIALOG_MAIN_SAVE: String = "Se ha guardado correctamente los registros en el archivo"
         val TEXT_ALERT_DIALOG_MAIN_DELATE: String = "¿Seguro que quieres eliminar el archivo?"
         val TEXT_ALERT_DIALOG_NEW_FILE: String = "Ingrese el nombre del archivo:"
+        val TEXT_ERROR_PASSWORD: String = "La contraseña es incorrecta"
         val TEXT_ALERT_DIALOG_NEW_FILE_PASSWORD: String = "Ingrese la contraseña del archivo:"
         val TEXT_CHECK_TITLE: String = "Titulo";
         val TEXT_CHECK_USER: String = "Usuario";
