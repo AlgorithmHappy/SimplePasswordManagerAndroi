@@ -44,7 +44,6 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.compose.runtime.LaunchedEffect
 import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
-import dev.gerardomarquez.simplepasswordmanager.utils.decryptDatabaseFile
 
 /**
  * Metodo principal que encapsulara todos los elementos de la vista para realizar el login de la

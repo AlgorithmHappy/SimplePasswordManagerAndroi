@@ -243,7 +243,7 @@ class Constants {
 
         private val B64_SALT: String = "VGVzdFNhbHRAMTIzNA==" // Solo pruebas, se tiene que cambiar por un salt seguro, no se si hacer otra seccion para que el usuario pueda generar uno seguro y aleatorio
 
-        val PATH_TMP_DATABASE: String = "/data/data/dev.gerardomarquez.simplepasswordmanager/databases/tmp_database"
+        val PATH_TMP_DATABASE: String = "/data/data/dev.gerardomarquez.simplepasswordmanager/databases/tmp_database.db"
         val SALT_FILE_NAME: String = "salt.txt"
     }
 }

@@ -35,7 +35,7 @@ object SettingsDataStore {
      * @param databasePath Ruta de la base de datos
      */
     suspend fun saveOneDatabasePath(context: Context, databasePath: String) {
-        var listDatabasesPaths = getDatabasesPaths(context).toMutableList()
+        var listDatabasesPaths: MutableList<String> = getDatabasesPaths(context).first()
         if(listDatabasesPaths.contains(databasePath) )
             listDatabasesPaths.remove(databasePath)
         listDatabasesPaths.add(Constants.GLOBAL_START_INDEX, databasePath)
@@ -60,12 +60,10 @@ object SettingsDataStore {
      * @param context Contexto de la aplicación
      * @return Lista de rutas de las bases de datos
      */
-    suspend fun getDatabasesPaths(context: Context): List<String> {
-        val flowDatabasesPaths = context.dataStore.data.map { settings ->
-            settings[LIST_DATABASES_KEY] ?: Constants.GLOBAL_STR_LEFT_BRACKET + Constants.GLOBAL_STR_RIGHT_BRACKET
+    fun getDatabasesPaths(context: Context): Flow<MutableList<String>> {
+        return context.dataStore.data.map { settings ->
+            Json.decodeFromString(settings[LIST_DATABASES_KEY] ?: Constants.GLOBAL_STR_LEFT_BRACKET + Constants.GLOBAL_STR_RIGHT_BRACKET)
         }
-        val jsonString: String = flowDatabasesPaths.first()
-        return Json.decodeFromString(jsonString)
     }
 
     /**

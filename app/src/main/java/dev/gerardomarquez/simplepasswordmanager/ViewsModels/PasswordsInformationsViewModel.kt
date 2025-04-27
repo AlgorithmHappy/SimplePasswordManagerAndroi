@@ -24,6 +24,7 @@ import dev.gerardomarquez.simplepasswordmanager.utils.generateSecretKey
 import dev.gerardomarquez.simplepasswordmanager.utils.hexStringToByteArray
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -615,7 +616,9 @@ class PasswordsInformationsViewModel(
      */
     fun selectedAllListPaths(context: Context){
         viewModelScope.launch {
-            stateListPaths = SettingsDataStore.getDatabasesPaths(context = context)
+            SettingsDataStore.getDatabasesPaths(context = context).collect {
+                stateListPaths = it.toMutableList()
+            }
         }
     }
 
@@ -641,25 +644,15 @@ class PasswordsInformationsViewModel(
                 databasePath = path
             )
         }
-        selectedAllListPaths(context)
     }
 
     /**
      * Metodo que inicializa la lista de los nombres de los archivos sin extension
-     * @param context Contexto de la aplicacion
      */
     fun selectedAllListFileNames(context: Context) {
         viewModelScope.launch {
-            if(stateListPaths.isEmpty() ){
-                stateListFilesNames = SettingsDataStore
-                    .getDatabasesPaths(context = context)
-                    .toList().map {
-                        iterator ->
-                        iterator.split(Constants.STR_SLASH).last().replace(".db", "") // Se obtiene solo el nombre de la base de datos
-                    }
-            } else {
-                stateListFilesNames = stateListPaths.map {
-                        iterator ->
+            SettingsDataStore.getDatabasesPaths(context = context).collect {
+                stateListFilesNames = it.toMutableList().map { iterator ->
                     iterator.split(Constants.STR_SLASH).last().replace(".db", "") // Se obtiene solo el nombre de la base de datos
                 }
             }
@@ -709,10 +702,8 @@ class PasswordsInformationsViewModel(
     fun saveTempDatabaseEncrypted(password: String){
         viewModelScope.launch {
             stateClearPasswordDb = password
-            /*val inputFile = File(Constants.PATH_TMP_DATABASE)
-            val outputFile = File(stateSelectedPath)*/
             val inputFile1 = File(Constants.PATH_TMP_DATABASE)
-            val outputFile1 = File(stateSelectedPath)
+            val outputFile1 = File(stateSelectedPath + ".db")
             val inputFile2 = File(Constants.PATH_TMP_DATABASE + "-shm")
             val outputFile2 = File(stateSelectedPath + "-shm")
             val inputFile3 = File(Constants.PATH_TMP_DATABASE + "-wal")
@@ -763,9 +754,7 @@ class PasswordsInformationsViewModel(
      */
     fun replaceEncryptedDBForTmpDB(){
         viewModelScope.launch {
-            /*val inputFile = File(stateSelectedPath)
-            val outputFile = File(Constants.PATH_TMP_DATABASE)*/
-            val inputFile1 = File(stateSelectedPath)
+            val inputFile1 = File(stateSelectedPath + ".db")
             val outputFile1 = File(Constants.PATH_TMP_DATABASE)
             val inputFile2 = File(stateSelectedPath + "-shm")
             val outputFile2 = File(Constants.PATH_TMP_DATABASE + "-shm")

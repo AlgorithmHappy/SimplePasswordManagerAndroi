@@ -9,25 +9,25 @@ import kotlinx.serialization.Serializable
  * @param pathFolderFile Ruta de la base de datos que se agrego
  */
 @Serializable
-object ScreLogin
+object Login
 
 @Serializable
-data class ScreFolderFileExplorer(val selectedFolderString: String)
+data class FolderFileExplorer(val selectedFolderString: String)
 
 @Serializable
-object ScreNewFileExplorer
+object NewFileExplorer
 
 @Serializable
-object ScreMain
+object Main
 
 @Serializable
-object ScreInsertPassword
+object InsertPassword
 
 @Serializable
-data class ScreUpdatePassword(val idPasswordInformation: Int)
+data class UpdatePassword(val idPasswordInformation: Int)
 
 @Serializable
-object ScreFilters
+object Filters
 
 @Serializable
-object ScreSettings
+object Settings

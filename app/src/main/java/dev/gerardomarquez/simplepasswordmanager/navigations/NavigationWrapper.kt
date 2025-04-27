@@ -25,70 +25,71 @@ fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewMo
     val navigationController = rememberNavController()
     NavHost(
         navController = navigationController,
-        startDestination = ScreLogin
+        startDestination = Login
     ){
-        composable<ScreLogin>{
+        composable<Login>{
             Login(
                 modifier = modifier,
                 viewModel = viewModel,
                 navigateToMain = {
-                    navigationController.navigate(ScreMain)
+                    navigationController.navigate(Main)
                 },
                 navigateToFolderFileExplorer = {
                     selectedFolderString ->
-                    navigationController.navigate(ScreFolderFileExplorer(selectedFolderString = selectedFolderString) )
+                    navigationController.navigate(FolderFileExplorer(selectedFolderString = selectedFolderString) )
                 },
                 navigateToNewFileExplorer = {
-                    navigationController.navigate(ScreNewFileExplorer)
+                    navigationController.navigate(NewFileExplorer)
                 },
                 navigateToSettings = {
-                    navigationController.navigate(ScreSettings)
+                    navigationController.navigate(Settings)
                 }
             )
         }
-        composable<ScreMain> {
+        composable<Main> {
             Main(
                 modifier = modifier,
                 viewModel = viewModel,
                 navigateToFilters = {
-                    navigationController.navigate(ScreFilters)
+                    navigationController.navigate(Filters)
                 },
                 navigateToInsert = {
-                    navigationController.navigate(ScreInsertPassword)
+                    navigationController.navigate(InsertPassword)
                 },
                 navigateToLogin = {
-                    navigationController.navigate(ScreLogin)
+                    navigationController.navigate(Login)
                 },
                 navigateToUpdate = {
                     idPasswordInformation ->
-                    navigationController.navigate(ScreUpdatePassword(idPasswordInformation = idPasswordInformation) )
+                    navigationController.navigate(UpdatePassword(idPasswordInformation = idPasswordInformation) )
                 }
             )
         }
-        composable<ScreNewFileExplorer> {
+        composable<NewFileExplorer> {
             NewFileExplorerView(
                 modifier = modifier,
                 viewModel = viewModel,
                 navigateToMain = {
-                    navigationController.navigate(ScreMain)
+                    navigationController.navigate(Main)
                 },
                 navigateToLogin = {
                     navigationController.popBackStack()
                 }
             )
         }
-        composable<ScreFolderFileExplorer> {
+        composable<FolderFileExplorer> {
             backStackEntry ->
-            val folderFileExplorer: ScreFolderFileExplorer = backStackEntry.toRoute()
+            val folderFileExplorer: FolderFileExplorer = backStackEntry.toRoute()
             OpenFileExplorerView(
                 modifier = modifier,
+                viewModel = viewModel,
                 selectedFolderString = folderFileExplorer.selectedFolderString,
                 navigateToLogin = {
                     navigationController.popBackStack()
                 }
             )
         }
-        composable<ScreFilters> {
+        composable<Filters> {
             Filters(
                 modifier = modifier,
                 viewModel = viewModel,
@@ -97,7 +98,7 @@ fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewMo
                 }
             )
         }
-        composable<ScreInsertPassword> {
+        composable<InsertPassword> {
             DataInsert(
                 modifier = modifier,
                 viewModel = viewModel,
@@ -106,9 +107,9 @@ fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewMo
                 }
             )
         }
-        composable<ScreUpdatePassword> {
+        composable<UpdatePassword> {
             backStackEntry ->
-            val idPasswordInformation: ScreUpdatePassword = backStackEntry.toRoute()
+            val idPasswordInformation: UpdatePassword = backStackEntry.toRoute()
             DataUpdate(
                 modifier = modifier,
                 viewModel = viewModel,
@@ -118,7 +119,7 @@ fun NavigationWrapper(modifier: Modifier, viewModel: PasswordsInformationsViewMo
                 }
             )
         }
-        composable<ScreSettings> {
+        composable<Settings> {
             Settings(
                 modifier = modifier,
                 viewModel = viewModel,

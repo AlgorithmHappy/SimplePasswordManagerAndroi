@@ -20,7 +20,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "tmp_database"
+                    "tmp_database.db"
                 ).build()
                 INSTANCE = instance
                 instance
@@ -38,7 +38,7 @@ abstract class AppDatabase : RoomDatabase() {
                 INSTANCE = null
 
                 // 2. Borrar los archivos de la base de datos
-                context.deleteDatabase("tmp_database")
+                context.deleteDatabase("tmp_database.db")
             }
         }
     }
