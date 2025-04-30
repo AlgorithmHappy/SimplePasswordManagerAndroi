@@ -16,7 +16,6 @@ import javax.crypto.spec.SecretKeySpec
 import com.lambdapioneer.argon2kt.Argon2Kt
 import com.lambdapioneer.argon2kt.Argon2KtResult
 import com.lambdapioneer.argon2kt.Argon2Mode
-import java.security.SecureRandom
 
 /**
 * Metodo que obtiene todas las carpetas que se encuentran en el directorio que se le pase
@@ -25,7 +24,13 @@ import java.security.SecureRandom
  */
 fun getFolders(path: String = Environment.getExternalStorageDirectory().absolutePath): List<String> {
     val directory = File(path)
-    return directory.listFiles()?.filter { it.isDirectory }?.map { it.name } ?: emptyList()
+    val validatedFolders: List<String> = listOf(
+        Environment.getExternalStorageDirectory().absolutePath + "Documents",
+        Environment.getExternalStorageDirectory().absolutePath + "Downloads"
+    )
+    return directory.listFiles()?.filter {
+        it.isDirectory && (it.startsWith(validatedFolders.first() ) || it.startsWith(validatedFolders.last() ) ) // Validamos que la carpeta sea de documentos o de descargas y que sea un directorio
+    }?.map { it.name } ?: emptyList()
 }
 
 /**

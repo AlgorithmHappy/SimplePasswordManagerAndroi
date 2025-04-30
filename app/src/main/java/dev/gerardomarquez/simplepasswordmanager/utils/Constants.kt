@@ -103,15 +103,12 @@ class Constants {
         val GLOBAL_NEGATIVE_NUMBER: Int = -1;
         val GLOBAL_SELECCIONAR: String = "Selecciona una opción"
         val STR_SLASH: String = "/"
-        val STR_CORCHETES: String = "[]"
         val GLOBAL_STR_DATABASE_EXTENSION: String = "db"
         val GLOBAL_STR_DOT: String = "."
         val GLOBAL_STR_URI_TO_PATH: String = "/tree/primary:"
         val GLOBAL_STR_URI_FOLDER_LEVEL: String = "%2F"
         val GLOBAL_STR_LEFT_BRACKET: String = "["
         val GLOBAL_STR_RIGHT_BRACKET: String = "]"
-        val GLOBAL_STR_DOUBLE_QUOTATION_MARKS: String = "\""
-        val GLOBAL_INT_ONE: Int = 1
 
         /**
          * Tamaños de textos
@@ -198,6 +195,8 @@ class Constants {
         val TXT_SETTINGS_SALT: String = "Cambiar salt:"
         val TXT_SETTINGS_SALT_SELECT: String = "Elegir uno creado previamente:"
         val TXT_SETTINGS_SALT_WARNING: String = "*El \"salt\" es como el candado de tu contraseña, si se cambia el salt la contraseña se vuelve irreconocible. Guardar el salt junto con tu contraseña"
+        val TEXT_SELECT_DATABASE: String = "Selecciona una base de datos"
+        val TEXT_NEW_FILE_VALIDATION: String = "Ningun campo puede estar vacio"
 
         /**
          * Textos de propiedades de configuracion

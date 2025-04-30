@@ -190,15 +190,6 @@ fun OpenFileExplorerView(
                     if(selectedIndexFile != Constants.GLOBAL_NEGATIVE_NUMBER) {
                         val completePath: String = currentPath + Constants.STR_SLASH + fileName
                         viewModel.saveOnePathDatabase(context = context, path = completePath)
-                        /*CoroutineScope(Dispatchers.IO).launch {
-                            val completePath: String = currentPath + Constants.STR_SLASH + fileName
-                            SettingsDataStore.saveOneDatabasePath(
-                                context = context,
-                                databasePath = completePath
-                            )
-                        }*/
-                        //viewModel.selectedAllListPaths(context = context)
-                        //viewModel.selectedAllListFileNames(context = context)
                         navigateToLogin()
                     }
                 }

@@ -141,7 +141,7 @@ fun Login(
                     Password(
                         password = viewModel.stateClearPasswordDb,
                         onPasswordChange = {
-                            viewModel.changeClearPasswordDb(password = it)
+                            viewModel.changeClearPasswordDb(password = it.trim() )
                         }
                     )
                 }
@@ -152,6 +152,10 @@ fun Login(
                 ) {
                     ButtonLogin(
                         onClick = {
+                            if(viewModel.stateSelectedFileName.isBlank() || viewModel.stateSelectedFileName.equals(Constants.GLOBAL_SELECCIONAR) ) {
+                                Toast.makeText(context, Constants.TEXT_SELECT_DATABASE, Toast.LENGTH_LONG).show()
+                                return@ButtonLogin // Mata el proceso de accion del boton y no sigue con el codigo de abajo
+                            }
                             viewModel.replaceEncryptedDBForTmpDB()
                             if(!viewModel.stateLockMain) {
                                 viewModel.conectNewDatabase(context = context)
@@ -177,7 +181,10 @@ fun Login(
                         )
                     }
                     ButtonNew(
-                        onClick = navigateToNewFileExplorer
+                        onClick = {
+                            viewModel.changeClearPasswordDb(password = "") // Se limpia el password
+                            navigateToNewFileExplorer()
+                        }
                     )
 
                 }
@@ -253,7 +260,6 @@ fun DataBasesDropDown(
                     contentDescription = Constants.DESCRIPTION_ICON_DROPDOWN_LOGIN,
                     modifier = Modifier
                         .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_HEIGTH_DROPDOWN_ARROW)
-                        .clickable { expanded = !expanded }
                 )
             }
         )

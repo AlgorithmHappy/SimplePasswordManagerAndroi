@@ -2,6 +2,7 @@ package dev.gerardomarquez.simplepasswordmanager.views
 
 import android.content.Context
 import android.os.Environment
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +24,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -164,19 +164,17 @@ fun NewFileExplorerView(
         onChangeFileName = {it -> fileName = it},
         onChangePassword = {it -> viewModel.changeClearPasswordDb(password = it)},
         onClickOk = {
+            if(viewModel.stateClearPasswordDb.isBlank() || fileName.isBlank() ){
+                Toast.makeText(context, Constants.TEXT_NEW_FILE_VALIDATION, Toast.LENGTH_LONG).show()
+                return@InsertNameNewFile // No sigue el flujo aqui se queda
+            }
             showDialog = false
-            /*CoroutineScope(Dispatchers.IO).launch {
-                val completePath: String = selectedFolder + Constants.STR_SLASH + fileName
-                SettingsDataStore.saveOneDatabasePath(
-                    context = context,
-                    databasePath = completePath
-                )
-            }*/
             val completePath: String = selectedFolder + Constants.STR_SLASH + fileName
             viewModel.changeSelectedPath(path = completePath)
             viewModel.saveOnePathDatabase(context = context, path = completePath)
             viewModel.deleteTempDatabase(context = context) // Se borra la base de datos temporal porque ya que se va
             // a crear una nueva base de datos esta tiene que estar limpia
+            viewModel.changeClearPasswordDb("")// Limpiamos el password
             navigateToMain()
         },
         onClickCancel = {
