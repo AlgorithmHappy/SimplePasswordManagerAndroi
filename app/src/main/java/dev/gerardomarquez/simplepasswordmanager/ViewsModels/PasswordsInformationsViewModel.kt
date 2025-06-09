@@ -1,6 +1,7 @@
 package dev.gerardomarquez.simplepasswordmanager.ViewsModels
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
@@ -672,12 +673,14 @@ class PasswordsInformationsViewModel(
     fun deleteTempDatabase(context: Context){
         /*val database = AppDatabase.resetDatabase(context = context)
         passwordInformationDao = database.passwordsInformationsDao()*/
-        AppDatabase.deleteDatabase(context = context)
-        if(!state.listPaswordInformation.isEmpty() ){
-            state = state.copy(// Se limpia la lista de passwords porque se elimino la base de datos
-                listPaswordInformation = emptyList(),
-                ready = true
-            )
+        viewModelScope.launch {
+            AppDatabase.deleteDatabase(context = context)
+            if(!state.listPaswordInformation.isEmpty() ){
+                state = state.copy(// Se limpia la lista de passwords porque se elimino la base de datos
+                    listPaswordInformation = emptyList(),
+                    ready = true
+                )
+            }
         }
     }
 
@@ -697,7 +700,7 @@ class PasswordsInformationsViewModel(
         viewModelScope.launch {
             stateClearPasswordDb = password
             val inputFile1 = File(Constants.PATH_TMP_DATABASE)
-            val outputFile1 = File(stateSelectedPath + ".db")
+            val outputFile1 = File(stateSelectedPath)
             val inputFile2 = File(Constants.PATH_TMP_DATABASE + "-shm")
             val outputFile2 = File(stateSelectedPath + "-shm")
             val inputFile3 = File(Constants.PATH_TMP_DATABASE + "-wal")
@@ -748,7 +751,7 @@ class PasswordsInformationsViewModel(
      */
     fun replaceEncryptedDBForTmpDB(){
         viewModelScope.launch {
-            val inputFile1 = File(stateSelectedPath + ".db")
+            val inputFile1 = File(stateSelectedPath)
             val outputFile1 = File(Constants.PATH_TMP_DATABASE)
             val inputFile2 = File(stateSelectedPath + "-shm")
             val outputFile2 = File(Constants.PATH_TMP_DATABASE + "-shm")
@@ -787,6 +790,7 @@ class PasswordsInformationsViewModel(
                 )
                 stateLockMain = false
             } catch (exception: Exception){
+                exception.printStackTrace()
                 _errorDecryptUi.send(true)
                 stateLockMain = true
             }

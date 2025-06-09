@@ -109,6 +109,7 @@ class Constants {
         val GLOBAL_STR_URI_FOLDER_LEVEL: String = "%2F"
         val GLOBAL_STR_LEFT_BRACKET: String = "["
         val GLOBAL_STR_RIGHT_BRACKET: String = "]"
+        val GLOBAL_STR_URI_TO_PATH_BASE: String = "primary%3A"
 
         /**
          * Tamaños de textos
@@ -197,6 +198,7 @@ class Constants {
         val TXT_SETTINGS_SALT_WARNING: String = "*El \"salt\" es como el candado de tu contraseña, si se cambia el salt la contraseña se vuelve irreconocible. Guardar el salt junto con tu contraseña"
         val TEXT_SELECT_DATABASE: String = "Selecciona una base de datos"
         val TEXT_NEW_FILE_VALIDATION: String = "Ningun campo puede estar vacio"
+        val TEXT_TO_BACK_PATH_INVALID: String = "Solo se puede elegir la carpeta de documentos y descargas por privacidad"
 
         /**
          * Textos de propiedades de configuracion
@@ -242,7 +244,7 @@ class Constants {
 
         private val B64_SALT: String = "VGVzdFNhbHRAMTIzNA==" // Solo pruebas, se tiene que cambiar por un salt seguro, no se si hacer otra seccion para que el usuario pueda generar uno seguro y aleatorio
 
-        val PATH_TMP_DATABASE: String = "/data/data/dev.gerardomarquez.simplepasswordmanager/databases/tmp_database.db"
+        val PATH_TMP_DATABASE: String = "/data/data/dev.gerardomarquez.simplepasswordmanager/databases/tmp_database"
         val SALT_FILE_NAME: String = "salt.txt"
     }
 }

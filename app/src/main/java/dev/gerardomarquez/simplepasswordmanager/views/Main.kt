@@ -232,7 +232,7 @@ fun Main(
                         password = viewModel.stateClearPasswordDb
                     )
                     confirmationDialog = true
-                    viewModel.deleteTempDatabase(context = context) // Se borra para que no quede
+                    //viewModel.deleteTempDatabase(context = context) // Se borra para que no quede
                     // cache ni algun archivo en claro temporal   sd
                 }
             )

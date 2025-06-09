@@ -36,12 +36,13 @@ import dev.gerardomarquez.simplepasswordmanager.utils.Constants
 import dev.gerardomarquez.simplepasswordmanager.utils.getFiles
 import dev.gerardomarquez.simplepasswordmanager.utils.getFolders
 import android.net.Uri
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.draw.clip
 import dev.gerardomarquez.simplepasswordmanager.ViewsModels.PasswordsInformationsViewModel
-import dev.gerardomarquez.simplepasswordmanager.repositories.SettingsDataStore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 /**
  * Metodo principal que ordena todos los elementos y variables que contendra la pantalla
@@ -76,6 +77,33 @@ fun OpenFileExplorerView(
     var selectedIndexFile by rememberSaveable { mutableStateOf(value = Constants.GLOBAL_NEGATIVE_NUMBER) }
     var foldersAndFiles by rememberSaveable { mutableStateOf(value = getFolders(currentPath) + getFiles(context = context, uri = Uri.parse(mutableSelectUriStr) ) ) }
     var fileName by rememberSaveable { mutableStateOf(value = "") }
+    var pathInvalid by rememberSaveable { mutableStateOf(value = false) }
+
+    pathInvalid = !(
+        selectedFolderString.contains(
+            Constants.GLOBAL_STR_URI_TO_PATH_BASE +
+            Environment
+                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                .absolutePath
+                .split(Constants.STR_SLASH)
+                .last()
+        ) ||
+        selectedFolderString.contains(
+            Constants.GLOBAL_STR_URI_TO_PATH_BASE +
+            Environment
+                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+                .absolutePath
+                .split(Constants.STR_SLASH)
+                .last()
+        )
+    )
+    DialogToBack(
+        show = pathInvalid,
+        text = Constants.TEXT_TO_BACK_PATH_INVALID,
+        onDismissRequest = {
+            navigateToLogin()
+        }
+    )
 
     Column(
         modifier = modifier
@@ -333,6 +361,52 @@ fun BackFolderInFolderExplorer(modifier: Modifier){
         contentDescription = Constants.DESCRIPTION_ICON_BACK_FOLDER,
         modifier = modifier
     )
+}
+
+/**
+ * Dialogo que indica que la ruta seleccionada no es valida
+ * @param show Con esta variable se define si se mostrara o no el dialogo
+ * @param text Este texto es el que se le muestra al usuario para indicarle que la ruta es invalida
+ * @param onDismissRequest Con este metodo se cambia el valor de la variable show para ocultar el
+ * dialogo
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DialogToBack(show: Boolean, text: String, onDismissRequest: () -> Unit){
+    if(show) {
+        BasicAlertDialog(
+            modifier = Modifier
+                .fillMaxWidth(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_WIDTH)
+                .fillMaxHeight(fraction = Constants.WEIGHT_LAYOUT_DIALOGS_HEIGHT),
+            onDismissRequest = onDismissRequest,
+        ) {
+            Column(
+                modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
+                    .clip(RoundedCornerShape(Constants.DP_ROUNDED_DIALOGS.dp) )
+                    .fillMaxSize()
+                    .padding(
+                        horizontal = Constants.DP_PADDING_DIALOGS.dp,
+                        vertical = Constants.DP_PADDING_DIALOGS.dp
+                    ),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = text,
+                    textAlign = TextAlign.Center
+                )
+                OutlinedButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = Constants.DP_PADDING_DIALOGS.dp),
+                    onClick = onDismissRequest,
+                    shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp)
+                ) {
+                    Text(text = Constants.TEXT_BUTTON_OK)
+                }
+            }
+        }
+    }
 }
 
 /*@Composable

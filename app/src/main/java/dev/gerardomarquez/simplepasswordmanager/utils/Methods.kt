@@ -3,6 +3,7 @@ package dev.gerardomarquez.simplepasswordmanager.utils
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
+import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import java.io.File
 import java.io.FileInputStream
@@ -25,11 +26,15 @@ import com.lambdapioneer.argon2kt.Argon2Mode
 fun getFolders(path: String = Environment.getExternalStorageDirectory().absolutePath): List<String> {
     val directory = File(path)
     val validatedFolders: List<String> = listOf(
-        Environment.getExternalStorageDirectory().absolutePath + "Documents",
-        Environment.getExternalStorageDirectory().absolutePath + "Downloads"
+        Environment
+            .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            .path,
+        Environment
+            .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+            .path
     )
     return directory.listFiles()?.filter {
-        it.isDirectory && (it.startsWith(validatedFolders.first() ) || it.startsWith(validatedFolders.last() ) ) // Validamos que la carpeta sea de documentos o de descargas y que sea un directorio
+        it.isDirectory && (it.path.contains(validatedFolders.first() ) || it.path.contains(validatedFolders.last() ) ) // Validamos que la carpeta sea de documentos o de descargas y que sea un directorio
     }?.map { it.name } ?: emptyList()
 }
 
@@ -114,6 +119,7 @@ fun encryptDatabaseFile(
     val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
     cipher.init(Cipher.ENCRYPT_MODE, secretKey) // IV aleatorio automático
     val iv = cipher.iv // Obtener el IV generado
+    Log.d("iv", "IV: ${iv.joinToString(",")}")
 
     FileOutputStream(outputDatabaseFile).use { output ->
         output.write(iv) // Guardar IV al inicio del archivo
@@ -130,7 +136,6 @@ fun encryptDatabaseFile(
  * @param inputDataBaseFile Archivo .db encriptado
  * @param outputDatabaseFile Archivo .db de la base de datos en claro listo para ser utilizado con room
  * @param secretKey Password que introdujo el usuario pero ya transformado con Argon2 para ser valido
- * @throws Exception Si ocurre un error al desencriptar el archivo (Como por ejemplo si el secretKey no es)
  */
 @Throws(
     Exception::class
@@ -143,6 +148,7 @@ fun decryptDatabaseFile(
     FileInputStream(inputDataBaseFile).use { input ->
         val iv = ByteArray(16)
         input.read(iv) // Leer IV almacenado
+        Log.d("iv", "IV: ${iv.joinToString(",")}")
         val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
         cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec(iv))
 

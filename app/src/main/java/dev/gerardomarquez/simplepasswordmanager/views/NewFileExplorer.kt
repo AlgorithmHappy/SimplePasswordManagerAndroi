@@ -2,6 +2,7 @@ package dev.gerardomarquez.simplepasswordmanager.views
 
 import android.content.Context
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -65,6 +66,11 @@ fun NewFileExplorerView(
     var showDialog by rememberSaveable { mutableStateOf(value = false) }
     var fileName by rememberSaveable { mutableStateOf(value = "") }
     val context: Context = LocalContext.current
+
+    folders.forEach {
+        it ->
+            Log.d("hola", it)
+    }
 
     Column(
         modifier = modifier
@@ -151,6 +157,15 @@ fun NewFileExplorerView(
                 modifier = Modifier
                     .weight(weight = Constants.WEIGHT_LAYOUT_NEW_FILE_EXPLORER_BUTTONS)
                     .fillMaxHeight(),
+                enabled = selectedFolder.contains(
+                    Environment
+                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                        .path
+                ) || selectedFolder.contains(
+                    Environment
+                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+                        .path
+                ),
                 onClick = {
                     showDialog = true
                 }
@@ -246,9 +261,10 @@ fun NewSelectedFolder(modifier: Modifier, folderName: String){
  * @param onClick Metodo que se ejecutara al presionar el boton
  */
 @Composable
-fun NewButtonSelect(modifier: Modifier, onClick: () -> Unit){
+fun NewButtonSelect(modifier: Modifier, enabled: Boolean, onClick: () -> Unit){
     OutlinedButton(
         modifier = modifier,
+        enabled = enabled,
         onClick = onClick,
         shape = RoundedCornerShape(Constants.DP_ROUNDED_BUTTON.dp)
     ) {
@@ -323,7 +339,6 @@ fun InsertNameNewFile(
                 modifier = Modifier // Este modificador sera el que se pasa como argumento, se tendra que modificar mas adelante
                     .clip(RoundedCornerShape(Constants.DP_ROUNDED_DIALOGS.dp) )
                     .fillMaxSize()
-                    .background(color = Color.White)
                     .padding(
                         horizontal = Constants.DP_PADDING_DIALOGS.dp,
                         vertical = Constants.DP_PADDING_DIALOGS.dp
